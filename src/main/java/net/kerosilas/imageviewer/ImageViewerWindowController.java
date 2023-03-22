@@ -7,6 +7,7 @@ import java.util.List;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,9 +17,10 @@ import javafx.stage.Stage;
 
 public class ImageViewerWindowController {
 
-    @FXML private Button startButton, stopButton;
+    @FXML private Button startStopButton;
     @FXML private Slider slideshowSpeedSlider;
     @FXML private ImageView imageView;
+    @FXML private Label sliderValueLabel;
 
     private final List<Image> images = new ArrayList<>();
     private int currentImageIndex = 0;
@@ -49,16 +51,14 @@ public class ImageViewerWindowController {
         displayImage(1);
     }
 
-    @FXML private void handleStartSlideshow() {
-        isSlideshowRunning = true;
-        stopButton.setDisable(false);
-        startButton.setDisable(true);
-    }
-
-    @FXML private void handleStopSlideshow() {
-        isSlideshowRunning = false;
-        stopButton.setDisable(true);
-        startButton.setDisable(false);
+    @FXML private void handleStartStopSlideshow() {
+        if(isSlideshowRunning) {
+            isSlideshowRunning = false;
+            startStopButton.setText("Start");
+        } else {
+            isSlideshowRunning = true;
+            startStopButton.setText("Stop");
+        }
     }
 
     public void initialize() {
@@ -72,6 +72,11 @@ public class ImageViewerWindowController {
 
         // Start the thread
         slideshowThread.start();
+
+        // Add a listener to the slider that will format the value and display it in a label
+        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
+        });
     }
 
     // This method will display the image at the currentImageIndex.
