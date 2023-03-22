@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,7 +23,7 @@ public class ImageViewerWindowController {
 
     private final List<Image> images = new ArrayList<>();
     private int currentImageIndex = 0;
-    private boolean isSlideshowRunning = false;
+    private SlideshowRunnable slideshowRunnable;
 
     @FXML private void handleLoad() {
         FileChooser fileChooser = new FileChooser();
@@ -52,30 +51,24 @@ public class ImageViewerWindowController {
     }
 
     @FXML private void handleStartStopSlideshow() {
-        if(isSlideshowRunning) {
-            isSlideshowRunning = false;
+        if(slideshowRunnable.isSlideshowRunning()) {
+            slideshowRunnable.setSlideshowRunning(false);
             startStopButton.setText("Start");
         } else {
-            isSlideshowRunning = true;
+            slideshowRunnable.setSlideshowRunning(true);
             startStopButton.setText("Stop");
         }
     }
 
     public void initialize() {
-        // Create a new thread to run the slideshow.
-        // The slideshow is off by default. It will be turned on when the user clicks the start button
-        Thread slideshowThread = new Thread(() -> slideshow());
-
-        // Set the thread as a daemon thread
-        // This means that the thread will not prevent the application from exiting
-        slideshowThread.setDaemon(true);
-
-        // Start the thread
+        slideshowRunnable = new SlideshowRunnable((int) slideshowSpeedSlider.getValue(), false, this); // The slideshow is off by default. It will be turned on when the user clicks the start button
+        Thread slideshowThread = new Thread(slideshowRunnable);
+        slideshowThread.setDaemon(true); // This means that the thread will not prevent the application from exiting
         slideshowThread.start();
 
-        // Add a listener to the slider that will format the value and display it in a label
-        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> { // Add a listener to the slider that will format the value and display it in a label
             sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
+            slideshowRunnable.setSliderValue(newValue.intValue()); // Update the slideshowRunnable object with the new slider value
         });
     }
 
@@ -84,7 +77,7 @@ public class ImageViewerWindowController {
     // -1 means previous image
     // 0 means current image
     // 1 means next image
-    private void displayImage(int indexChange) {
+    void displayImage(int indexChange) {
         if (!images.isEmpty()) {
             if (currentImageIndex + indexChange < 0) {
                 currentImageIndex = images.size() - 1;
@@ -92,27 +85,6 @@ public class ImageViewerWindowController {
                 currentImageIndex = (currentImageIndex + indexChange) % images.size();
             }
             imageView.setImage(images.get(currentImageIndex));
-        }
-    }
-
-    // This method will be run in a separate thread
-    private void slideshow() {
-        try {
-            while (true) {
-                // Get the current delay value from the slider. Slider shows in seconds, so it needs to be multiplied by 1000
-                int delay = (int) slideshowSpeedSlider.getValue() * 1000;
-
-                // Sleep for that amount of milliseconds
-                Thread.sleep(delay);
-
-                // Update the UI from the JavaFX Application thread using runLater()
-                Platform.runLater(() -> {
-                    if (isSlideshowRunning)
-                        displayImage(1);
-                });
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }
