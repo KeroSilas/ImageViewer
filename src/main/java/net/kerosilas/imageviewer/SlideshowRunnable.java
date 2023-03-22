@@ -23,14 +23,11 @@ public class SlideshowRunnable implements Runnable {
     @Override
     public void run() {
         try {
-            while (true) {
-                int delay = sliderValue * 1000;
-
-                Thread.sleep(delay);
+            while (true) {;
+                Thread.sleep(sliderValue * 1000L);
 
                 Platform.runLater(() -> {
                     if (isSlideshowRunning)
-                        // Call displayImage using controller reference
                         controller.displayImage(1);
                 });
             }
