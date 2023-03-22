@@ -61,7 +61,7 @@
                   <Insets top="6.0" />
                </HBox.margin>
             </Slider>
-            <Label fx:id="sliderValueLabel" text="1s" translateX="-6.0">
+            <Label fx:id="sliderValueLabel" text="1s" translateX="-4.0">
                <HBox.margin>
                   <Insets />
                </HBox.margin></Label>
