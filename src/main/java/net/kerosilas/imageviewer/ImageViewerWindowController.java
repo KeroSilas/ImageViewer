@@ -16,9 +16,7 @@ public class ImageViewerWindowController
 {
     private final List<Image> images = new ArrayList<>();
     private int currentImageIndex = 0;
-
-    @FXML
-    Parent root;
+    private Thread slideshowThread = new Thread(() -> slideshow(2000));
 
     @FXML
     private ImageView imageView;
@@ -63,11 +61,37 @@ public class ImageViewerWindowController
         }
     }
 
+    @FXML
+    private void handleStartSlideshow() {
+        slideshowThread.start();
+    }
+
+    @FXML
+    private void handleStopSlideshow() {
+
+    }
+
+    public void initialize() {
+    }
+
     private void displayImage()
     {
         if (!images.isEmpty())
         {
             imageView.setImage(images.get(currentImageIndex));
+        }
+    }
+
+    private void slideshow(int delay) {
+        if (!images.isEmpty()) {
+            currentImageIndex = (currentImageIndex + 1) % images.size();
+            displayImage();
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            slideshow(delay);
         }
     }
 }
