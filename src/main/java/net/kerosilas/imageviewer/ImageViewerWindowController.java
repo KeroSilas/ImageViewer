@@ -62,7 +62,8 @@ public class ImageViewerWindowController {
     }
 
     public void initialize() {
-        // Create a new thread to run the slideshow
+        // Create a new thread to run the slideshow.
+        // The slideshow is off by default. It will be turned on when the user clicks the start button
         Thread slideshowThread = new Thread(() -> slideshow());
 
         // Set the thread as a daemon thread
@@ -73,6 +74,7 @@ public class ImageViewerWindowController {
         slideshowThread.start();
     }
 
+    // This method will display the image at the currentImageIndex.
     // indexChange can be -1, 0 or 1
     // -1 means previous image
     // 0 means current image
