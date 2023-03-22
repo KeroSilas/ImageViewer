@@ -80,6 +80,7 @@ public class ImageViewerWindowController {
 
         imagePane.setAlignment(Pos.CENTER);
 
+        // Add a listener to the window size that will resize the image to fit the window
         Platform.runLater(() -> {
             imageView.getScene().getWindow().heightProperty().addListener((observable, oldValue, newValue) -> {
                 imageView.setFitHeight(newValue.doubleValue() - 86);
