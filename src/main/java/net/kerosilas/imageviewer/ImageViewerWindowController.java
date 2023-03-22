@@ -3,134 +3,109 @@ package net.kerosilas.imageviewer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import javafx.event.ActionEvent;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-public class ImageViewerWindowController
-{
-    @FXML
-    private Slider slideshowSpeedSlider;
+public class ImageViewerWindowController {
 
-    @FXML
-    private TextField slideshowSpeedTextField;
+    @FXML private Button startButton, stopButton;
+    @FXML private Slider slideshowSpeedSlider;
+    @FXML private ImageView imageView;
 
     private final List<Image> images = new ArrayList<>();
     private int currentImageIndex = 0;
-    ExecutorService es = Executors.newFixedThreadPool(5);
     private boolean isSlideshowRunning = false;
-    private int delay = 1000;
-    private final Thread slideshowThread = new Thread(() -> slideshow(delay));
 
-    @FXML
-    private ImageView imageView;
-
-    @FXML
-    private void handleBtnLoadAction()
-    {
+    @FXML private void handleLoad() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select image files");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("Images",
                 "*.png", "*.jpg", "*.gif", "*.tif", "*.bmp"));
         List<File> files = fileChooser.showOpenMultipleDialog(new Stage());
 
-        if (!files.isEmpty())
-        {
-            files.forEach((File f) ->
-            {
-                images.add(new Image(f.toURI().toString()));
-            });
-            displayImage();
+        try {
+            if (!files.isEmpty()) {
+                files.forEach((File f) -> images.add(new Image(f.toURI().toString())));
+                displayImage(0);
+            }
+        } catch (NullPointerException e) {
+            System.out.println("No files selected");
         }
     }
 
-    @FXML
-    private void handleBtnPreviousAction()
-    {
-        if (!images.isEmpty())
-        {
-            currentImageIndex =
-                    (currentImageIndex - 1 + images.size()) % images.size();
-            displayImage();
-        }
+    @FXML private void handlePrevious() {
+        displayImage(-1);
     }
 
-    @FXML
-    private void handleBtnNextAction()
-    {
-        if (!images.isEmpty())
-        {
-            currentImageIndex = (currentImageIndex + 1) % images.size();
-            displayImage();
-        }
+    @FXML private void handleNext() {
+        displayImage(1);
     }
 
-    @FXML
-    private void handleStartSlideshow() {
-        //es.submit(() -> slideshow(delay));
-        if (!isSlideshowRunning)
-            slideshowThread.start();
+    @FXML private void handleStartSlideshow() {
         isSlideshowRunning = true;
+        stopButton.setDisable(false);
+        startButton.setDisable(true);
     }
 
-    @FXML
-    private void handleStopSlideshow() {
-        //slideshowThread = null;
-        //es.shutdownNow();
+    @FXML private void handleStopSlideshow() {
         isSlideshowRunning = false;
+        stopButton.setDisable(true);
+        startButton.setDisable(false);
     }
 
     public void initialize() {
-        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            // change the speed of the slideshow
-            if (isSlideshowRunning) {
-                handleStopSlideshow();
-                delay = newValue.intValue() * 1000;
-                System.out.println(delay);
-                handleStartSlideshow();
-            }
-        });
+        // Create a new thread to run the slideshow
+        Thread slideshowThread = new Thread(() -> slideshow());
 
-        slideshowSpeedTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            // change the speed of the slideshow
-            if (isSlideshowRunning) {
-                handleStopSlideshow();
-                delay = Integer.parseInt(newValue) * 1000;
-                System.out.println(delay);
-                handleStartSlideshow();
-            }
-        });
+        // Set the thread as a daemon thread
+        // This means that the thread will not prevent the application from exiting
+        slideshowThread.setDaemon(true);
+
+        // Start the thread
+        slideshowThread.start();
     }
 
-    private void displayImage()
-    {
-        if (!images.isEmpty())
-        {
+    // indexChange can be -1, 0 or 1
+    // -1 means previous image
+    // 0 means current image
+    // 1 means next image
+    private void displayImage(int indexChange) {
+        if (!images.isEmpty()) {
+            if (currentImageIndex + indexChange < 0) {
+                currentImageIndex = images.size() - 1;
+            } else {
+                currentImageIndex = (currentImageIndex + indexChange) % images.size();
+            }
             imageView.setImage(images.get(currentImageIndex));
         }
     }
 
-    private void slideshow(int delay) {
-        if (!images.isEmpty()) {
-            displayImage();
-            try {
+    // This method will be run in a separate thread
+    private void slideshow() {
+        try {
+            while (true) {
+                // Get the current delay value from the slider. Slider shows in seconds, so it needs to be multiplied by 1000
+                int delay = (int) slideshowSpeedSlider.getValue() * 1000;
+
+                // Sleep for that amount of milliseconds
                 Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                System.out.println("Slideshow interrupted");
+
+                // Update the UI from the JavaFX Application thread using runLater()
+                Platform.runLater(() -> {
+                    if (isSlideshowRunning)
+                        displayImage(1);
+                });
             }
-            currentImageIndex = (currentImageIndex + 1) % images.size();
-            if (isSlideshowRunning)
-                slideshow(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
