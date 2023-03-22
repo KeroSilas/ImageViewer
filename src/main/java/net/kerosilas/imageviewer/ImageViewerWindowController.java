@@ -16,7 +16,8 @@ public class ImageViewerWindowController
 {
     private final List<Image> images = new ArrayList<>();
     private int currentImageIndex = 0;
-    private Thread slideshowThread = new Thread(() -> slideshow(2000));
+    private Thread slideshowThread;
+    private boolean isSlideshowRunning = false;
 
     @FXML
     private ImageView imageView;
@@ -58,20 +59,21 @@ public class ImageViewerWindowController
         {
             currentImageIndex = (currentImageIndex + 1) % images.size();
             displayImage();
+
         }
     }
 
     @FXML
     private void handleStartSlideshow() {
+        slideshowThread = new Thread(() -> slideshow(2000));
+        isSlideshowRunning = true;
         slideshowThread.start();
     }
 
     @FXML
     private void handleStopSlideshow() {
-
-    }
-
-    public void initialize() {
+        slideshowThread.interrupt();
+        isSlideshowRunning = false;
     }
 
     private void displayImage()
@@ -84,14 +86,15 @@ public class ImageViewerWindowController
 
     private void slideshow(int delay) {
         if (!images.isEmpty()) {
-            currentImageIndex = (currentImageIndex + 1) % images.size();
             displayImage();
             try {
                 Thread.sleep(delay);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.println("Slideshow interrupted");
             }
-            slideshow(delay);
+            currentImageIndex = (currentImageIndex + 1) % images.size();
+            if (isSlideshowRunning)
+                slideshow(delay);
         }
     }
 }
