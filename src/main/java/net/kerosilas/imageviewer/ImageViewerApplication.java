@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-
+// Ye
 public class ImageViewerApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
