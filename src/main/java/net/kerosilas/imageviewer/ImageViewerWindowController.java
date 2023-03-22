@@ -3,9 +3,14 @@ package net.kerosilas.imageviewer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
@@ -14,10 +19,18 @@ import javafx.stage.Stage;
 
 public class ImageViewerWindowController
 {
+    @FXML
+    private Slider slideshowSpeedSlider;
+
+    @FXML
+    private TextField slideshowSpeedTextField;
+
     private final List<Image> images = new ArrayList<>();
     private int currentImageIndex = 0;
-    private Thread slideshowThread;
+    ExecutorService es = Executors.newFixedThreadPool(5);
     private boolean isSlideshowRunning = false;
+    private int delay = 1000;
+    private final Thread slideshowThread = new Thread(() -> slideshow(delay));
 
     @FXML
     private ImageView imageView;
@@ -59,21 +72,44 @@ public class ImageViewerWindowController
         {
             currentImageIndex = (currentImageIndex + 1) % images.size();
             displayImage();
-
         }
     }
 
     @FXML
     private void handleStartSlideshow() {
-        slideshowThread = new Thread(() -> slideshow(2000));
+        //es.submit(() -> slideshow(delay));
+        if (!isSlideshowRunning)
+            slideshowThread.start();
         isSlideshowRunning = true;
-        slideshowThread.start();
     }
 
     @FXML
     private void handleStopSlideshow() {
-        slideshowThread.interrupt();
+        //slideshowThread = null;
+        //es.shutdownNow();
         isSlideshowRunning = false;
+    }
+
+    public void initialize() {
+        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // change the speed of the slideshow
+            if (isSlideshowRunning) {
+                handleStopSlideshow();
+                delay = newValue.intValue() * 1000;
+                System.out.println(delay);
+                handleStartSlideshow();
+            }
+        });
+
+        slideshowSpeedTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // change the speed of the slideshow
+            if (isSlideshowRunning) {
+                handleStopSlideshow();
+                delay = Integer.parseInt(newValue) * 1000;
+                System.out.println(delay);
+                handleStartSlideshow();
+            }
+        });
     }
 
     private void displayImage()
