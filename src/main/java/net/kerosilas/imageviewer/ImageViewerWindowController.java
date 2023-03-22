@@ -4,22 +4,26 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.TilePane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class ImageViewerWindowController {
 
-    @FXML private Button startStopButton;
+    @FXML private Button startStopButton, previousButton, nextButton;
     @FXML private Slider slideshowSpeedSlider;
     @FXML private ImageView imageView;
     @FXML private Label sliderValueLabel;
+    @FXML private TilePane imagePane;
 
     private final List<Image> images = new ArrayList<>();
     private int currentImageIndex = 0;
@@ -36,6 +40,9 @@ public class ImageViewerWindowController {
             if (!files.isEmpty()) {
                 files.forEach((File f) -> images.add(new Image(f.toURI().toString())));
                 displayImage(0);
+                startStopButton.setDisable(false);
+                previousButton.setDisable(false);
+                nextButton.setDisable(false);
             }
         } catch (NullPointerException e) {
             System.out.println("No files selected");
@@ -69,6 +76,17 @@ public class ImageViewerWindowController {
         slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> { // Add a listener to the slider that will format the value and display it in a label
             sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
             slideshowRunnable.setSliderValue(newValue.intValue()); // Update the slideshowRunnable object with the new slider value
+        });
+
+        imagePane.setAlignment(Pos.CENTER);
+
+        Platform.runLater(() -> {
+            imageView.getScene().getWindow().heightProperty().addListener((observable, oldValue, newValue) -> {
+                imageView.setFitHeight(newValue.doubleValue() - 86);
+            });
+            imageView.getScene().getWindow().widthProperty().addListener((observable, oldValue, newValue) -> {
+                imageView.setFitWidth(newValue.doubleValue() - 16);
+            });
         });
     }
 
