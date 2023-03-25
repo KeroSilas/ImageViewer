@@ -12,7 +12,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
 import javafx.scene.layout.TilePane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -25,7 +27,6 @@ public class ImageViewerWindowController {
     @FXML private Label sliderValueLabel;
     @FXML private TilePane imagePane;
 
-    private final List<Image> images = new ArrayList<>();
     private final List<File> imageFiles = new ArrayList<>();
     private int currentImageIndex = 0;
     private SlideshowTask slideshowTask;
@@ -35,14 +36,10 @@ public class ImageViewerWindowController {
         fileChooser.setTitle("Select image files");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("Images",
                 "*.png", "*.jpg", "*.gif", "*.tif", "*.bmp"));
-        try {
-            imageFiles.addAll(fileChooser.showOpenMultipleDialog(new Stage()));
-        } catch (NullPointerException e) {
-            System.out.println("No files selected");
-        }
+        List<File> files = fileChooser.showOpenMultipleDialog(new Stage());
 
-        if (!imageFiles.isEmpty()) {
-            imageFiles.forEach((File f) -> images.add(new Image(f.toURI().toString())));
+        if (files != null && !files.isEmpty()) {
+            imageFiles.addAll(files);
             displayCurrentImage();
             startStopButton.setDisable(false);
             previousButton.setDisable(false);
@@ -53,11 +50,15 @@ public class ImageViewerWindowController {
     @FXML private void handlePrevious() {
         stopSlideshow();
         displayPrevImage();
+
+        printPixelColor();
     }
 
     @FXML private void handleNext() {
         stopSlideshow();
         displayNextImage();
+
+        printPixelColor();
     }
 
     @FXML private void handleStartStopSlideshow() {
@@ -87,30 +88,33 @@ public class ImageViewerWindowController {
     }
 
     void displayCurrentImage() {
-        if (!images.isEmpty()) {
-            imageView.setImage(images.get(currentImageIndex));
+        if (!imageFiles.isEmpty()) {
+            imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
+            System.out.println(imageFiles.get(currentImageIndex).getName().replace("%20", " "));
         }
     }
 
     void displayNextImage() {
-        if (!images.isEmpty()) {
-            if (currentImageIndex == images.size() - 1) {
+        if (!imageFiles.isEmpty()) {
+            if (currentImageIndex == imageFiles.size() - 1) {
                 currentImageIndex = 0;
             } else {
                 currentImageIndex++;
             }
-            imageView.setImage(images.get(currentImageIndex));
+            imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
+            System.out.println(imageFiles.get(currentImageIndex).getName().replace("%20", " "));
         }
     }
 
     void displayPrevImage() {
-        if (!images.isEmpty()) {
+        if (!imageFiles.isEmpty()) {
             if (currentImageIndex == 0) {
-                currentImageIndex = images.size() - 1;
+                currentImageIndex = imageFiles.size() - 1;
             } else {
                 currentImageIndex--;
             }
-            imageView.setImage(images.get(currentImageIndex));
+            imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
+            System.out.println(imageFiles.get(currentImageIndex).getName().replace("%20", " "));
         }
     }
 
@@ -140,5 +144,34 @@ public class ImageViewerWindowController {
             slideshowSpeedSlider.setDisable(false);
             startStopButton.setText("Start");
         }
+    }
+
+    private void printPixelColor() {
+        Image image = new Image(imageFiles.get(currentImageIndex).toURI().toString());
+        PixelReader pixelReader = image.getPixelReader();
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        int redCount = 0;
+        int greenCount = 0;
+        int blueCount = 0;
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                Color color = pixelReader.getColor(x, y);
+
+                if (color.getRed() > color.getGreen() && color.getRed() > color.getBlue()) {
+                    redCount++;
+                } else if (color.getGreen() > color.getRed() && color.getGreen() > color.getBlue()) {
+                    greenCount++;
+                } else if (color.getBlue() > color.getRed() && color.getBlue() > color.getGreen()) {
+                    blueCount++;
+                }
+            }
+        }
+
+        System.out.println("Red pixels: " + redCount);
+        System.out.println("Green pixels: " + greenCount);
+        System.out.println("Blue pixels: " + blueCount);
     }
 }
