@@ -12,9 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -24,8 +23,9 @@ public class ImageViewerWindowController {
     @FXML private Button startStopButton, previousButton, nextButton;
     @FXML private Slider slideshowSpeedSlider;
     @FXML private ImageView imageView;
-    @FXML private Label sliderValueLabel;
+    @FXML private Label sliderValueLabel, nameLabel, pathLabel, blueCountLabel, greenCountLabel, redCountLabel, totalCountLabel;
     @FXML private TilePane imagePane;
+    @FXML private HBox infoPane;
 
     private final List<File> imageFiles = new ArrayList<>();
     private int currentImageIndex = 0;
@@ -40,25 +40,22 @@ public class ImageViewerWindowController {
 
         if (files != null && !files.isEmpty()) {
             imageFiles.addAll(files);
-            displayCurrentImage();
+            updateImage();
             startStopButton.setDisable(false);
             previousButton.setDisable(false);
             nextButton.setDisable(false);
+            infoPane.setVisible(true);
         }
     }
 
     @FXML private void handlePrevious() {
         stopSlideshow();
         displayPrevImage();
-
-        printPixelColor();
     }
 
     @FXML private void handleNext() {
         stopSlideshow();
         displayNextImage();
-
-        printPixelColor();
     }
 
     @FXML private void handleStartStopSlideshow() {
@@ -78,7 +75,7 @@ public class ImageViewerWindowController {
                 imageView.setFitHeight(newValue.doubleValue() - 86);
             });
             imageView.getScene().getWindow().widthProperty().addListener((observable, oldValue, newValue) -> {
-                imageView.setFitWidth(newValue.doubleValue() - 16);
+                imageView.setFitWidth(newValue.doubleValue() - 265);
             });
         });
 
@@ -87,34 +84,25 @@ public class ImageViewerWindowController {
         });
     }
 
-    void displayCurrentImage() {
-        if (!imageFiles.isEmpty()) {
-            imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
-            System.out.println(imageFiles.get(currentImageIndex).getName().replace("%20", " "));
-        }
-    }
-
-    void displayNextImage() {
+    private void displayNextImage() {
         if (!imageFiles.isEmpty()) {
             if (currentImageIndex == imageFiles.size() - 1) {
                 currentImageIndex = 0;
             } else {
                 currentImageIndex++;
             }
-            imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
-            System.out.println(imageFiles.get(currentImageIndex).getName().replace("%20", " "));
+            updateImage();
         }
     }
 
-    void displayPrevImage() {
+    private void displayPrevImage() {
         if (!imageFiles.isEmpty()) {
             if (currentImageIndex == 0) {
                 currentImageIndex = imageFiles.size() - 1;
             } else {
                 currentImageIndex--;
             }
-            imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
-            System.out.println(imageFiles.get(currentImageIndex).getName().replace("%20", " "));
+            updateImage();
         }
     }
 
@@ -123,8 +111,13 @@ public class ImageViewerWindowController {
             slideshowTask = new SlideshowTask(imageFiles, (int) slideshowSpeedSlider.getValue(), currentImageIndex);
             slideshowTask.valueProperty().addListener((ov, oldValue, newValue) -> {
                 imageView.setImage(newValue);
-                File file = new File(newValue.getUrl()); // Get the current image file
-                System.out.println(file.getName().replace("%20", " ")); // Print the name of the current image
+                File file = new File(newValue.getUrl());
+                nameLabel.setText(String.format("Name: %s", file.getName().replace("%20", " ")));
+                pathLabel.setText(String.format("Path: %s", file.getPath()));
+                if (newValue != oldValue) {
+                    currentImageIndex = slideshowTask.getIndex();
+                    countPixelColors();
+                }
             });
             Thread thread = new Thread(slideshowTask);
             thread.setDaemon(true);
@@ -146,32 +139,24 @@ public class ImageViewerWindowController {
         }
     }
 
-    private void printPixelColor() {
-        Image image = new Image(imageFiles.get(currentImageIndex).toURI().toString());
-        PixelReader pixelReader = image.getPixelReader();
-        int width = (int) image.getWidth();
-        int height = (int) image.getHeight();
+    private void updateImage() {
+        imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
+        File file = new File(imageFiles.get(currentImageIndex).toURI().toString());
+        nameLabel.setText(String.format("Name: %s", file.getName().replace("%20", " ")));
+        pathLabel.setText(String.format("Path: %s", file.getPath()));
+        countPixelColors();
+    }
 
-        int redCount = 0;
-        int greenCount = 0;
-        int blueCount = 0;
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Color color = pixelReader.getColor(x, y);
-
-                if (color.getRed() > color.getGreen() && color.getRed() > color.getBlue()) {
-                    redCount++;
-                } else if (color.getGreen() > color.getRed() && color.getGreen() > color.getBlue()) {
-                    greenCount++;
-                } else if (color.getBlue() > color.getRed() && color.getBlue() > color.getGreen()) {
-                    blueCount++;
-                }
-            }
-        }
-
-        System.out.println("Red pixels: " + redCount);
-        System.out.println("Green pixels: " + greenCount);
-        System.out.println("Blue pixels: " + blueCount);
+    private void countPixelColors() {
+        PixelCounterTask pixelCounterTask = new PixelCounterTask(imageFiles.get(currentImageIndex));
+        pixelCounterTask.valueProperty().addListener((ov, oldValue, newValue) -> {
+            redCountLabel.setText(String.format("Red pixel count: %d (%.2f%%)", newValue.getRedCount(), newValue.getRedPercentage() * 100));
+            greenCountLabel.setText(String.format("Green pixel count: %d (%.2f%%)", newValue.getGreenCount(), newValue.getGreenPercentage() * 100));
+            blueCountLabel.setText(String.format("Blue pixel count: %d (%.2f%%)", newValue.getBlueCount(), newValue.getBluePercentage() * 100));
+            totalCountLabel.setText(String.format("Total pixel count: %d", newValue.getTotalCount()));
+        });
+        Thread thread = new Thread(pixelCounterTask);
+        thread.setDaemon(true);
+        thread.start();
     }
 }

@@ -9,9 +9,10 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.TilePane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="700.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.kerosilas.imageviewer.ImageViewerWindowController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="1080.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.kerosilas.imageviewer.ImageViewerWindowController">
     <top>
         <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-border-color: d2d2d2; -fx-background-color: f0f0f0;" BorderPane.alignment="CENTER">
             <children>
@@ -81,4 +82,29 @@
          </children>
       </TilePane>
     </center>
+   <right>
+      <HBox fx:id="infoPane" prefWidth="250.0" style="-fx-background-color: f8f8f8;" visible="false" BorderPane.alignment="CENTER">
+         <children>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <VBox maxWidth="1.7976931348623157E308" prefWidth="238.0" spacing="6.0">
+               <children>
+                  <Label fx:id="nameLabel" text="Name:" />
+                  <Label fx:id="pathLabel" text="Path:" />
+                  <Separator maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                     <padding>
+                        <Insets bottom="8.0" top="8.0" />
+                     </padding>
+                  </Separator>
+                  <Label fx:id="redCountLabel" text="Red pixel count:" />
+                  <Label fx:id="greenCountLabel" text="Green pixel count:" />
+                  <Label fx:id="blueCountLabel" text="Blue pixel count:" />
+                  <Label fx:id="totalCountLabel" text="Total pixel count:" />
+               </children>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" top="8.0" />
+               </padding>
+            </VBox>
+         </children>
+      </HBox>
+   </right>
 </BorderPane>

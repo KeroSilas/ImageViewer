@@ -13,7 +13,7 @@ public class ImageViewerApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(ImageViewerApplication.class.getResource("ImageViewerWindow.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Image Viewer");
-        stage.setMinWidth(720);
+        stage.setMinWidth(1142);
         stage.setMinHeight(580);
         stage.setScene(scene);
         stage.show();
