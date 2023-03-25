@@ -119,6 +119,8 @@ public class ImageViewerWindowController {
             slideshowTask = new SlideshowTask(imageFiles, (int) slideshowSpeedSlider.getValue(), currentImageIndex);
             slideshowTask.valueProperty().addListener((ov, oldValue, newValue) -> {
                 imageView.setImage(newValue);
+                File file = new File(newValue.getUrl()); // Get the current image file
+                System.out.println(file.getName().replace("%20", " ")); // Print the name of the current image
             });
             Thread thread = new Thread(slideshowTask);
             thread.setDaemon(true);
@@ -133,9 +135,6 @@ public class ImageViewerWindowController {
         if (slideshowTask != null) {
             currentImageIndex = slideshowTask.getIndex();
             slideshowTask.cancel();
-            slideshowTask.valueProperty().removeListener((ov, oldValue, newValue) -> {
-                imageView.setImage(newValue);
-            });
             slideshowTask = null;
 
             slideshowSpeedSlider.setDisable(false);
