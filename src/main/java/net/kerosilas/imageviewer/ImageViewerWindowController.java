@@ -6,25 +6,30 @@ import java.util.List;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class ImageViewerWindowController {
 
-    @FXML private Button startStopButton;
+    @FXML private Button startStopButton, previousButton, nextButton;
     @FXML private Slider slideshowSpeedSlider;
     @FXML private ImageView imageView;
-    @FXML private Label sliderValueLabel;
+    @FXML private Label sliderValueLabel, nameLabel, pathLabel, blueCountLabel, greenCountLabel, redCountLabel, totalCountLabel;
+    @FXML private TilePane imagePane;
+    @FXML private HBox infoPane;
 
-    private final List<Image> images = new ArrayList<>();
+    private final List<File> imageFiles = new ArrayList<>();
     private int currentImageIndex = 0;
-    private boolean isSlideshowRunning = false;
+    private SlideshowTask slideshowTask;
 
     @FXML private void handleLoad() {
         FileChooser fileChooser = new FileChooser();
@@ -33,86 +38,125 @@ public class ImageViewerWindowController {
                 "*.png", "*.jpg", "*.gif", "*.tif", "*.bmp"));
         List<File> files = fileChooser.showOpenMultipleDialog(new Stage());
 
-        try {
-            if (!files.isEmpty()) {
-                files.forEach((File f) -> images.add(new Image(f.toURI().toString())));
-                displayImage(0);
-            }
-        } catch (NullPointerException e) {
-            System.out.println("No files selected");
+        if (files != null && !files.isEmpty()) {
+            imageFiles.addAll(files);
+            updateImage();
+            startStopButton.setDisable(false);
+            previousButton.setDisable(false);
+            nextButton.setDisable(false);
+            infoPane.setVisible(true);
         }
     }
 
     @FXML private void handlePrevious() {
-        displayImage(-1);
+        stopSlideshow();
+        displayPrevImage();
     }
 
     @FXML private void handleNext() {
-        displayImage(1);
+        stopSlideshow();
+        displayNextImage();
     }
 
     @FXML private void handleStartStopSlideshow() {
-        if(isSlideshowRunning) {
-            isSlideshowRunning = false;
-            startStopButton.setText("Start");
+        if (slideshowTask == null) {
+            startSlideshow();
         } else {
-            isSlideshowRunning = true;
-            startStopButton.setText("Stop");
+            stopSlideshow();
         }
     }
 
     public void initialize() {
-        // Create a new thread to run the slideshow.
-        // The slideshow is off by default. It will be turned on when the user clicks the start button
-        Thread slideshowThread = new Thread(() -> slideshow());
+        imagePane.setAlignment(Pos.CENTER);
 
-        // Set the thread as a daemon thread
-        // This means that the thread will not prevent the application from exiting
-        slideshowThread.setDaemon(true);
+        // Add a listener to the window size that will resize the image to fit the window
+        Platform.runLater(() -> {
+            imageView.getScene().getWindow().heightProperty().addListener((observable, oldValue, newValue) -> {
+                imageView.setFitHeight(newValue.doubleValue() - 86);
+            });
+            imageView.getScene().getWindow().widthProperty().addListener((observable, oldValue, newValue) -> {
+                imageView.setFitWidth(newValue.doubleValue() - 265);
+            });
+        });
 
-        // Start the thread
-        slideshowThread.start();
-
-        // Add a listener to the slider that will format the value and display it in a label
-        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> { // Add a listener to the slider that will format the value and display it in a label
             sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
         });
     }
 
-    // This method will display the image at the currentImageIndex.
-    // indexChange can be -1, 0 or 1
-    // -1 means previous image
-    // 0 means current image
-    // 1 means next image
-    private void displayImage(int indexChange) {
-        if (!images.isEmpty()) {
-            if (currentImageIndex + indexChange < 0) {
-                currentImageIndex = images.size() - 1;
+    private void displayNextImage() {
+        if (!imageFiles.isEmpty()) {
+            if (currentImageIndex == imageFiles.size() - 1) {
+                currentImageIndex = 0;
             } else {
-                currentImageIndex = (currentImageIndex + indexChange) % images.size();
+                currentImageIndex++;
             }
-            imageView.setImage(images.get(currentImageIndex));
+            updateImage();
         }
     }
 
-    // This method will be run in a separate thread
-    private void slideshow() {
-        try {
-            while (true) {
-                // Get the current delay value from the slider. Slider shows in seconds, so it needs to be multiplied by 1000
-                int delay = (int) slideshowSpeedSlider.getValue() * 1000;
-
-                // Sleep for that amount of milliseconds
-                Thread.sleep(delay);
-
-                // Update the UI from the JavaFX Application thread using runLater()
-                Platform.runLater(() -> {
-                    if (isSlideshowRunning)
-                        displayImage(1);
-                });
+    private void displayPrevImage() {
+        if (!imageFiles.isEmpty()) {
+            if (currentImageIndex == 0) {
+                currentImageIndex = imageFiles.size() - 1;
+            } else {
+                currentImageIndex--;
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            updateImage();
         }
+    }
+
+    private void startSlideshow() {
+        if (slideshowTask == null) {
+            slideshowTask = new SlideshowTask(imageFiles, (int) slideshowSpeedSlider.getValue(), currentImageIndex);
+            slideshowTask.valueProperty().addListener((ov, oldValue, newValue) -> {
+                imageView.setImage(newValue);
+                File file = new File(newValue.getUrl());
+                nameLabel.setText(String.format("Name: %s", file.getName().replace("%20", " ")));
+                pathLabel.setText(String.format("Path: %s", file.getPath()));
+                if (newValue != oldValue) {
+                    currentImageIndex = slideshowTask.getIndex();
+                    countPixelColors();
+                }
+            });
+            Thread thread = new Thread(slideshowTask);
+            thread.setDaemon(true);
+            thread.start();
+
+            slideshowSpeedSlider.setDisable(true);
+            startStopButton.setText("Stop");
+        }
+    }
+
+    private void stopSlideshow() {
+        if (slideshowTask != null) {
+            currentImageIndex = slideshowTask.getIndex();
+            slideshowTask.cancel();
+            slideshowTask = null;
+
+            slideshowSpeedSlider.setDisable(false);
+            startStopButton.setText("Start");
+        }
+    }
+
+    private void updateImage() {
+        imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
+        File file = new File(imageFiles.get(currentImageIndex).toURI().toString());
+        nameLabel.setText(String.format("Name: %s", file.getName().replace("%20", " ")));
+        pathLabel.setText(String.format("Path: %s", file.getAbsolutePath()));
+        countPixelColors();
+    }
+
+    private void countPixelColors() {
+        PixelCounterTask pixelCounterTask = new PixelCounterTask(imageFiles.get(currentImageIndex));
+        pixelCounterTask.valueProperty().addListener((ov, oldValue, newValue) -> {
+            redCountLabel.setText(String.format("Red pixel count: %d (%.2f%%)", newValue.getRedCount(), newValue.getRedPercentage() * 100));
+            greenCountLabel.setText(String.format("Green pixel count: %d (%.2f%%)", newValue.getGreenCount(), newValue.getGreenPercentage() * 100));
+            blueCountLabel.setText(String.format("Blue pixel count: %d (%.2f%%)", newValue.getBlueCount(), newValue.getBluePercentage() * 100));
+            totalCountLabel.setText(String.format("Total pixel count: %d", newValue.getTotalCount()));
+        });
+        Thread thread = new Thread(pixelCounterTask);
+        thread.setDaemon(true);
+        thread.start();
     }
 }
