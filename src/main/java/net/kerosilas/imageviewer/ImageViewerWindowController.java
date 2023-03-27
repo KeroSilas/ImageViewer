@@ -4,12 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.palexdev.materialfx.controls.MFXSlider;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -17,15 +16,15 @@ import javafx.scene.layout.TilePane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import io.github.palexdev.materialfx.controls.MFXButton;
 
 public class ImageViewerWindowController {
 
-    @FXML private Button startStopButton, previousButton, nextButton;
-    @FXML private Slider slideshowSpeedSlider;
+    @FXML private MFXButton startStopButton, previousButton, nextButton;
+    @FXML private MFXSlider slideshowSpeedSlider;
     @FXML private ImageView imageView;
     @FXML private Label sliderValueLabel, nameLabel, pathLabel, blueCountLabel, greenCountLabel, redCountLabel, totalCountLabel;
     @FXML private TilePane imagePane;
-    @FXML private HBox infoPane;
 
     private final List<File> imageFiles = new ArrayList<>();
     private int currentImageIndex = 0;
@@ -44,7 +43,6 @@ public class ImageViewerWindowController {
             startStopButton.setDisable(false);
             previousButton.setDisable(false);
             nextButton.setDisable(false);
-            infoPane.setVisible(true);
         }
     }
 
@@ -72,7 +70,7 @@ public class ImageViewerWindowController {
         // Add a listener to the window size that will resize the image to fit the window
         Platform.runLater(() -> {
             imageView.getScene().getWindow().heightProperty().addListener((observable, oldValue, newValue) -> {
-                imageView.setFitHeight(newValue.doubleValue() - 86);
+                imageView.setFitHeight(newValue.doubleValue() - 146);
             });
             imageView.getScene().getWindow().widthProperty().addListener((observable, oldValue, newValue) -> {
                 imageView.setFitWidth(newValue.doubleValue() - 265);
@@ -113,7 +111,7 @@ public class ImageViewerWindowController {
                 imageView.setImage(newValue);
                 File file = new File(newValue.getUrl());
                 nameLabel.setText(String.format("Name: %s", file.getName().replace("%20", " ")));
-                pathLabel.setText(String.format("Path: %s", file.getPath()));
+                pathLabel.setText(String.format("Path: %s", file.getParentFile().getPath().substring(6)));
                 if (newValue != oldValue) {
                     currentImageIndex = slideshowTask.getIndex();
                     countPixelColors();
@@ -143,17 +141,16 @@ public class ImageViewerWindowController {
         imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
         File file = new File(imageFiles.get(currentImageIndex).toURI().toString());
         nameLabel.setText(String.format("Name: %s", file.getName().replace("%20", " ")));
-        pathLabel.setText(String.format("Path: %s", file.getAbsolutePath()));
+        pathLabel.setText(String.format("Path: %s", file.getParentFile().getPath().substring(6)));
         countPixelColors();
     }
 
     private void countPixelColors() {
         PixelCounterTask pixelCounterTask = new PixelCounterTask(imageFiles.get(currentImageIndex));
         pixelCounterTask.valueProperty().addListener((ov, oldValue, newValue) -> {
-            redCountLabel.setText(String.format("Red pixel count: %d (%.2f%%)", newValue.getRedCount(), newValue.getRedPercentage() * 100));
-            greenCountLabel.setText(String.format("Green pixel count: %d (%.2f%%)", newValue.getGreenCount(), newValue.getGreenPercentage() * 100));
-            blueCountLabel.setText(String.format("Blue pixel count: %d (%.2f%%)", newValue.getBlueCount(), newValue.getBluePercentage() * 100));
-            totalCountLabel.setText(String.format("Total pixel count: %d", newValue.getTotalCount()));
+            redCountLabel.setText(String.format("%d (%.2f%%)", newValue.getRedCount(), newValue.getRedPercentage() * 100));
+            greenCountLabel.setText(String.format("%d (%.2f%%)", newValue.getGreenCount(), newValue.getGreenPercentage() * 100));
+            blueCountLabel.setText(String.format("%d (%.2f%%)", newValue.getBlueCount(), newValue.getBluePercentage() * 100));
         });
         Thread thread = new Thread(pixelCounterTask);
         thread.setDaemon(true);
