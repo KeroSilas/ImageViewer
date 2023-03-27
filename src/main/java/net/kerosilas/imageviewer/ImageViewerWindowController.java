@@ -143,7 +143,7 @@ public class ImageViewerWindowController {
         imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
         File file = new File(imageFiles.get(currentImageIndex).toURI().toString());
         nameLabel.setText(String.format("Name: %s", file.getName().replace("%20", " ")));
-        pathLabel.setText(String.format("Path: %s", file.getPath()));
+        pathLabel.setText(String.format("Path: %s", file.getAbsolutePath()));
         countPixelColors();
     }
 
