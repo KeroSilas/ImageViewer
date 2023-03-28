@@ -22,10 +22,10 @@ import javafx.util.Duration;
 
 public class ImageViewerWindowController {
 
-    @FXML private MFXButton startStopButton, previousButton, nextButton;
+    @FXML private MFXButton startStopButton, previousButton, nextButton, loadButton;
     @FXML private Slider slideshowSpeedSlider;
     @FXML private ImageView imageView;
-    @FXML private Label sliderValueLabel, nameLabel, pathLabel, blueCountLabel, greenCountLabel, redCountLabel;
+    @FXML private Label sliderValueLabel, nameLabel, pathLabel, blueCountLabel, greenCountLabel, redCountLabel, delayLabel;
     @FXML private HBox hBoxTop, hBoxBottom, pane;
     @FXML private BorderPane root;
 
@@ -46,10 +46,15 @@ public class ImageViewerWindowController {
             startStopButton.setDisable(false);
             previousButton.setDisable(false);
             nextButton.setDisable(false);
+            delayLabel.setDisable(false);
+            slideshowSpeedSlider.setDisable(false);
+            sliderValueLabel.setDisable(false);
             startStopButton.setButtonType(ButtonType.RAISED);
             previousButton.setButtonType(ButtonType.RAISED);
             nextButton.setButtonType(ButtonType.RAISED);
             hBoxBottom.setVisible(true);
+            loadButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;");
+            root.setStyle("-fx-background-color: #000000;");
             setupAnimations();
         }
     }
@@ -80,17 +85,17 @@ public class ImageViewerWindowController {
     public void initialize() {
         // Add a listener to the window size that will resize the image to fit the window
         Platform.runLater(() -> {
-            imageView.setFitHeight(imageView.getScene().getWindow().getHeight() - 39);
-            imageView.setFitWidth(imageView.getScene().getWindow().getWidth() - 16);
-            pane.setTranslateY((imageView.getScene().getWindow().getHeight() - 39) / 2);
-            pane.setTranslateX((imageView.getScene().getWindow().getWidth() - 16) / 2);
-            imageView.getScene().getWindow().heightProperty().addListener((observable, oldValue, newValue) -> {
-                    imageView.setFitHeight((newValue.doubleValue() - 39));
-                    pane.setTranslateY((newValue.doubleValue() - 39) / 2);
+            imageView.setFitHeight(imageView.getScene().getHeight());
+            imageView.setFitWidth(imageView.getScene().getWidth());
+            pane.setTranslateY((imageView.getScene().getHeight()) / 2);
+            pane.setTranslateX((imageView.getScene().getWidth()) / 2);
+            imageView.getScene().heightProperty().addListener((observable, oldValue, newValue) -> {
+                    imageView.setFitHeight((newValue.doubleValue()));
+                    pane.setTranslateY((newValue.doubleValue()) / 2);
             });
-            imageView.getScene().getWindow().widthProperty().addListener((observable, oldValue, newValue) -> {
-                    imageView.setFitWidth((newValue.doubleValue() - 16));
-                    pane.setTranslateX((newValue.doubleValue() - 16) / 2);
+            imageView.getScene().widthProperty().addListener((observable, oldValue, newValue) -> {
+                    imageView.setFitWidth((newValue.doubleValue()));
+                    pane.setTranslateX((newValue.doubleValue()) / 2);
             });
         });
         pane.toBack();
@@ -141,7 +146,7 @@ public class ImageViewerWindowController {
 
             slideshowSpeedSlider.setDisable(true);
             startStopButton.setText("Stop slideshow");
-            startStopButton.setStyle("-fx-background-color: #cc0000; -fx-text-fill: #ffffff;");
+            startStopButton.setStyle("-fx-background-color: #bd2323; -fx-text-fill: #ffffff;");
         }
     }
 
@@ -179,18 +184,18 @@ public class ImageViewerWindowController {
 
     private void setupAnimations() {
         // Setups the animation for the top and bottom HBoxes
-        hBoxTop.setTranslateY(-55);
-        hBoxBottom.setTranslateY(55);
+        hBoxTop.setTranslateY(-50);
+        hBoxBottom.setTranslateY(50);
 
-        TranslateTransition ttBottom = new TranslateTransition(Duration.millis(100), hBoxBottom);
-        TranslateTransition ttTop = new TranslateTransition(Duration.millis(100), hBoxTop);
+        TranslateTransition ttBottom = new TranslateTransition(Duration.millis(70), hBoxBottom);
+        TranslateTransition ttTop = new TranslateTransition(Duration.millis(70), hBoxTop);
 
         root.setOnMouseEntered(event -> {
-            ttTop.setByY(55);
+            ttTop.setByY(50);
             ttTop.setCycleCount(1);
             ttTop.setAutoReverse(false);
             ttTop.setDelay(Duration.millis(0));
-            ttBottom.setByY(-55);
+            ttBottom.setByY(-50);
             ttBottom.setCycleCount(1);
             ttBottom.setAutoReverse(false);
             ttBottom.setDelay(Duration.millis(0));
@@ -204,21 +209,19 @@ public class ImageViewerWindowController {
         });
 
         root.setOnMouseExited(event -> {
-            ttTop.setByY(-55);
+            ttTop.setByY(-50);
             ttTop.setCycleCount(1);
             ttTop.setAutoReverse(false);
-            ttTop.setDelay(Duration.millis(1100));
-            ttBottom.setByY(55);
+            ttBottom.setByY(50);
             ttBottom.setCycleCount(1);
             ttBottom.setAutoReverse(false);
-            ttBottom.setDelay(Duration.millis(1100));
             ttTop.play();
             ttBottom.play();
 
             ttTop.setOnFinished(e ->
-                    hBoxTop.setTranslateY(-55));
+                    hBoxTop.setTranslateY(-50));
             ttBottom.setOnFinished(e ->
-                    hBoxBottom.setTranslateY(55));
+                    hBoxBottom.setTranslateY(50));
         });
     }
 }
