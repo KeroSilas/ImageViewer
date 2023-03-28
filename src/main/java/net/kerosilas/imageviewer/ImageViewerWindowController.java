@@ -54,7 +54,7 @@ public class ImageViewerWindowController {
             nextButton.setButtonType(ButtonType.RAISED);
             hBoxBottom.setVisible(true);
             loadButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;");
-            root.setStyle("-fx-background-color: #000000;");
+            root.setStyle("-fx-background-color: #131313;");
             setupAnimations();
         }
     }
