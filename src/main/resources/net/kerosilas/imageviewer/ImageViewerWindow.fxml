@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -20,37 +21,52 @@
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor></MFXButton>
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
             <MFXButton fx:id="previousButton" depthLevel="LEVEL1" disable="true" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous">
                <cursor>
                   <Cursor fx:constant="HAND" />
-               </cursor></MFXButton>
+               </cursor>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></MFXButton>
             <MFXButton fx:id="nextButton" depthLevel="LEVEL1" disable="true" onAction="#handleNext" prefHeight="30.0" prefWidth="70.0" text="Next">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor></MFXButton>
-            <Separator orientation="VERTICAL" />
-            <Label text="Slideshow:">
-               <HBox.margin>
-                  <Insets left="12.0" />
-               </HBox.margin>
-               <font>
-                  <Font size="13.0" />
-               </font>
-            </Label>
-            <MFXButton fx:id="startStopButton" depthLevel="LEVEL1" disable="true" onAction="#handleStartStopSlideshow" prefHeight="30.0" prefWidth="70.0" text="Start" translateX="-3.0">
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+            <MFXButton fx:id="startStopButton" depthLevel="LEVEL1" disable="true" onAction="#handleStartStopSlideshow" prefHeight="30.0" prefWidth="120.0" text="Start slideshow" translateX="-3.0">
                <cursor>
                   <Cursor fx:constant="HAND" />
-               </cursor></MFXButton>
+               </cursor>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></MFXButton>
             <Label text="Delay:">
                <font>
                   <Font size="13.0" />
                </font>
                <HBox.margin>
-                  <Insets left="12.0" />
+                  <Insets />
                </HBox.margin>
             </Label>
             <Slider fx:id="slideshowSpeedSlider" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" prefWidth="120.0" showTickMarks="true" snapToTicks="true" translateX="-2.0" translateY="4.0" value="1.0" />
             <Label fx:id="sliderValueLabel" text="1s" translateX="-4.0" />
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+               <children>
+                  <MFXButton fx:id="fullscreenButton" buttonType="RAISED" depthLevel="LEVEL1" ellipsisString="" onAction="#handleFullscreen" prefHeight="30.0" prefWidth="30.0" text=" ">
+                     <font>
+                        <Font size="1.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true" translateX="2.0">
+                           <image>
+                              <Image url="@fullscreen_icon.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </MFXButton>
+               </children>
+            </HBox>
             </children>
             <opaqueInsets>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
