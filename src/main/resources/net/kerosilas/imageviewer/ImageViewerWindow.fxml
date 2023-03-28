@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
-<?import io.github.palexdev.materialfx.controls.MFXSlider?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="720.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.kerosilas.imageviewer.ImageViewerWindowController">
+<BorderPane fx:id="root" depthTest="ENABLE" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="720.0" style="-fx-background-color: white;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.kerosilas.imageviewer.ImageViewerWindowController">
     <top>
-        <HBox alignment="CENTER_LEFT" prefHeight="54.0" spacing="8.0" style="-fx-border-color: d2d2d2; -fx-background-color: f0f0f0;" BorderPane.alignment="CENTER">
+        <HBox fx:id="hBoxTop" alignment="CENTER_LEFT" prefHeight="54.0" spacing="8.0" style="-fx-border-color: d2d2d2; -fx-background-color: f0f0f0;" BorderPane.alignment="CENTER">
             <children>
-            <MFXButton fx:id="loadButton" buttonType="RAISED" depthLevel="LEVEL1" onAction="#handleLoad" prefHeight="30.0" prefWidth="120.0" text="Load images..." />
-            <MFXButton fx:id="previousButton" buttonType="RAISED" depthLevel="LEVEL1" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous" />
-            <MFXButton fx:id="nextButton" buttonType="RAISED" depthLevel="LEVEL1" onAction="#handleNext" prefHeight="30.0" prefWidth="70.0" text="Next" />
+            <MFXButton fx:id="loadButton" buttonType="RAISED" depthLevel="LEVEL1" onAction="#handleLoad" prefHeight="30.0" prefWidth="120.0" text="Load images...">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></MFXButton>
+            <MFXButton fx:id="previousButton" depthLevel="LEVEL1" disable="true" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></MFXButton>
+            <MFXButton fx:id="nextButton" depthLevel="LEVEL1" disable="true" onAction="#handleNext" prefHeight="30.0" prefWidth="70.0" text="Next">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></MFXButton>
             <Separator orientation="VERTICAL" />
             <Label text="Slideshow:">
                <HBox.margin>
@@ -29,7 +37,10 @@
                   <Font size="13.0" />
                </font>
             </Label>
-            <MFXButton fx:id="startStopButton" buttonType="RAISED" depthLevel="LEVEL1" onAction="#handleStartStopSlideshow" prefHeight="30.0" prefWidth="70.0" text="Start" />
+            <MFXButton fx:id="startStopButton" depthLevel="LEVEL1" disable="true" onAction="#handleStartStopSlideshow" prefHeight="30.0" prefWidth="70.0" text="Start" translateX="-3.0">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor></MFXButton>
             <Label text="Delay:">
                <font>
                   <Font size="13.0" />
@@ -38,43 +49,23 @@
                   <Insets left="12.0" />
                </HBox.margin>
             </Label>
-            <MFXSlider fx:id="slideshowSpeedSlider" alternativeUnitIncrement="1.0" max="5.0" min="1.0" popupPadding="4.0" prefWidth="120.0" tickUnit="1.0" translateY="1.0" unitIncrement="1.0" value="1.0">
-               <HBox.margin>
-                  <Insets left="6.0" />
-               </HBox.margin>
-            </MFXSlider>
-            <Label fx:id="sliderValueLabel" text="1s" />
+            <Slider fx:id="slideshowSpeedSlider" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" prefWidth="120.0" showTickMarks="true" snapToTicks="true" translateX="-2.0" translateY="4.0" value="1.0" />
+            <Label fx:id="sliderValueLabel" text="1s" translateX="-4.0" />
             </children>
             <opaqueInsets>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </opaqueInsets>
          <padding>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+            <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
          </padding>
         </HBox>
     </top>
-    <center>
-      <TilePane fx:id="imagePane" BorderPane.alignment="CENTER">
-         <children>
-                <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" TilePane.alignment="CENTER" />
-         </children>
-      </TilePane>
-    </center>
-   <left>
-      <BorderPane BorderPane.alignment="CENTER">
-         <center>
-            <ListView fx:id="imageListView" style="-fx-border-color: white;" />
-         </center>
-      </BorderPane>
-   </left>
    <bottom>
-      <HBox alignment="CENTER_LEFT" prefHeight="54.0" spacing="8.0" style="-fx-border-color: d2d2d2; -fx-background-color: f0f0f0;" BorderPane.alignment="CENTER">
+      <HBox fx:id="hBoxBottom" alignment="CENTER_LEFT" prefHeight="54.0" spacing="8.0" style="-fx-border-color: d2d2d2; -fx-background-color: f0f0f0;" BorderPane.alignment="CENTER">
          <opaqueInsets>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </opaqueInsets>
          <children>
-            <MFXButton buttonType="RAISED" depthLevel="LEVEL1" prefHeight="30.0" prefWidth="70.0" />
-            <Separator orientation="VERTICAL" />
             <VBox alignment="CENTER_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets />
@@ -104,8 +95,15 @@
             </VBox>
          </children>
          <padding>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+            <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
          </padding>
       </HBox>
    </bottom>
+   <center>
+      <HBox fx:id="pane" alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+                <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </HBox>
+   </center>
 </BorderPane>
