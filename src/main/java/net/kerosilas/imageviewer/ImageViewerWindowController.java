@@ -50,6 +50,7 @@ public class ImageViewerWindowController {
             previousButton.setButtonType(ButtonType.RAISED);
             nextButton.setButtonType(ButtonType.RAISED);
             hBoxBottom.setVisible(true);
+            setupAnimations();
         }
     }
 
@@ -69,6 +70,11 @@ public class ImageViewerWindowController {
         } else {
             stopSlideshow();
         }
+    }
+
+    @FXML private void handleFullscreen() {
+        Stage stage = (Stage) root.getScene().getWindow();
+        stage.setFullScreen(!stage.isFullScreen());
     }
 
     public void initialize() {
@@ -91,49 +97,6 @@ public class ImageViewerWindowController {
 
         slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> { // Add a listener to the slider that will format the value and display it in a label
             sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
-        });
-
-        // Setups the animation for the top and bottom HBoxes
-        hBoxTop.setTranslateY(-55);
-        hBoxBottom.setTranslateY(55);
-
-        TranslateTransition ttBottom = new TranslateTransition(Duration.millis(100), hBoxBottom);
-        TranslateTransition ttTop = new TranslateTransition(Duration.millis(100), hBoxTop);
-
-        root.setOnMouseEntered(event -> {
-            ttTop.setByY(55);
-            ttTop.setCycleCount(1);
-            ttTop.setAutoReverse(false);
-            ttTop.setDelay(Duration.millis(0));
-            ttBottom.setByY(-55);
-            ttBottom.setCycleCount(1);
-            ttBottom.setAutoReverse(false);
-            ttBottom.setDelay(Duration.millis(0));
-            ttTop.play();
-            ttBottom.play();
-
-            ttTop.setOnFinished(e ->
-                    hBoxTop.setTranslateY(0));
-            ttBottom.setOnFinished(e ->
-                    hBoxBottom.setTranslateY(0));
-        });
-
-        root.setOnMouseExited(event -> {
-            ttTop.setByY(-55);
-            ttTop.setCycleCount(1);
-            ttTop.setAutoReverse(false);
-            ttTop.setDelay(Duration.millis(1100));
-            ttBottom.setByY(55);
-            ttBottom.setCycleCount(1);
-            ttBottom.setAutoReverse(false);
-            ttBottom.setDelay(Duration.millis(1100));
-            ttTop.play();
-            ttBottom.play();
-
-            ttTop.setOnFinished(e ->
-                    hBoxTop.setTranslateY(-55));
-            ttBottom.setOnFinished(e ->
-                    hBoxBottom.setTranslateY(55));
         });
     }
 
@@ -177,7 +140,7 @@ public class ImageViewerWindowController {
             thread.start();
 
             slideshowSpeedSlider.setDisable(true);
-            startStopButton.setText("Stop");
+            startStopButton.setText("Stop slideshow");
             startStopButton.setStyle("-fx-background-color: #cc0000; -fx-text-fill: #ffffff;");
         }
     }
@@ -189,7 +152,7 @@ public class ImageViewerWindowController {
             slideshowTask = null;
 
             slideshowSpeedSlider.setDisable(false);
-            startStopButton.setText("Start");
+            startStopButton.setText("Start slideshow");
             startStopButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;");
         }
     }
@@ -212,5 +175,50 @@ public class ImageViewerWindowController {
         Thread thread = new Thread(pixelCounterTask);
         thread.setDaemon(true);
         thread.start();
+    }
+
+    private void setupAnimations() {
+        // Setups the animation for the top and bottom HBoxes
+        hBoxTop.setTranslateY(-55);
+        hBoxBottom.setTranslateY(55);
+
+        TranslateTransition ttBottom = new TranslateTransition(Duration.millis(100), hBoxBottom);
+        TranslateTransition ttTop = new TranslateTransition(Duration.millis(100), hBoxTop);
+
+        root.setOnMouseEntered(event -> {
+            ttTop.setByY(55);
+            ttTop.setCycleCount(1);
+            ttTop.setAutoReverse(false);
+            ttTop.setDelay(Duration.millis(0));
+            ttBottom.setByY(-55);
+            ttBottom.setCycleCount(1);
+            ttBottom.setAutoReverse(false);
+            ttBottom.setDelay(Duration.millis(0));
+            ttTop.play();
+            ttBottom.play();
+
+            ttTop.setOnFinished(e ->
+                    hBoxTop.setTranslateY(0));
+            ttBottom.setOnFinished(e ->
+                    hBoxBottom.setTranslateY(0));
+        });
+
+        root.setOnMouseExited(event -> {
+            ttTop.setByY(-55);
+            ttTop.setCycleCount(1);
+            ttTop.setAutoReverse(false);
+            ttTop.setDelay(Duration.millis(1100));
+            ttBottom.setByY(55);
+            ttBottom.setCycleCount(1);
+            ttBottom.setAutoReverse(false);
+            ttBottom.setDelay(Duration.millis(1100));
+            ttTop.play();
+            ttBottom.play();
+
+            ttTop.setOnFinished(e ->
+                    hBoxTop.setTranslateY(-55));
+            ttBottom.setOnFinished(e ->
+                    hBoxBottom.setTranslateY(55));
+        });
     }
 }
