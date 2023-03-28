@@ -24,7 +24,7 @@
                <font>
                   <Font name="Roboto" size="12.0" />
                </font></MFXButton>
-            <Separator orientation="VERTICAL" />
+            <Separator maxHeight="30.0" orientation="VERTICAL" />
             <MFXButton fx:id="previousButton" depthLevel="LEVEL1" disable="true" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous">
                <cursor>
                   <Cursor fx:constant="HAND" />
@@ -42,7 +42,7 @@
                <font>
                   <Font name="Roboto" size="12.0" />
                </font></MFXButton>
-            <Separator orientation="VERTICAL" />
+            <Separator maxHeight="30.0" orientation="VERTICAL" />
             <MFXButton fx:id="startStopButton" depthLevel="LEVEL1" disable="true" onAction="#handleStartStopSlideshow" prefHeight="30.0" prefWidth="120.0" text="Start slideshow" translateX="-3.0">
                <cursor>
                   <Cursor fx:constant="HAND" />
@@ -73,7 +73,7 @@
                         <Font size="1.0" />
                      </font>
                      <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true" translateX="2.0">
+                        <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true" translateX="2.0">
                            <image>
                               <Image url="@fullscreen_icon.png" />
                            </image>
