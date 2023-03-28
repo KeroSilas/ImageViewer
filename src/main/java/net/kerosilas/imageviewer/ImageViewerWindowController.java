@@ -122,11 +122,11 @@ public class ImageViewerWindowController {
             ttTop.setByY(-55);
             ttTop.setCycleCount(1);
             ttTop.setAutoReverse(false);
-            ttTop.setDelay(Duration.millis(1500));
+            ttTop.setDelay(Duration.millis(1100));
             ttBottom.setByY(55);
             ttBottom.setCycleCount(1);
             ttBottom.setAutoReverse(false);
-            ttBottom.setDelay(Duration.millis(1500));
+            ttBottom.setDelay(Duration.millis(1100));
             ttTop.play();
             ttBottom.play();
 
