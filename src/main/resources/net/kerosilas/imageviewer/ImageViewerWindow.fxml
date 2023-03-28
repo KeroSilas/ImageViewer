@@ -13,44 +13,59 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" depthTest="ENABLE" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="720.0" style="-fx-background-color: white;" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.kerosilas.imageviewer.ImageViewerWindowController">
+<BorderPane fx:id="root" depthTest="ENABLE" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="720.0" style="-fx-background-color: #cccccc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.kerosilas.imageviewer.ImageViewerWindowController">
     <top>
-        <HBox fx:id="hBoxTop" alignment="CENTER_LEFT" prefHeight="54.0" spacing="8.0" style="-fx-border-color: d2d2d2; -fx-background-color: f0f0f0;" BorderPane.alignment="CENTER">
+        <HBox fx:id="hBoxTop" alignment="CENTER_LEFT" prefHeight="50.0" spacing="8.0" style="-fx-background-color: f3f3f3;" BorderPane.alignment="CENTER">
             <children>
-            <MFXButton fx:id="loadButton" buttonType="RAISED" depthLevel="LEVEL1" onAction="#handleLoad" prefHeight="30.0" prefWidth="120.0" text="Load images...">
+            <MFXButton fx:id="loadButton" buttonType="RAISED" depthLevel="LEVEL1" onAction="#handleLoad" prefHeight="30.0" prefWidth="120.0" rippleColor="#bdbdbd" style="-fx-background-color: #30a14f; -fx-text-fill: white;" text="Load images...">
                <cursor>
                   <Cursor fx:constant="HAND" />
-               </cursor></MFXButton>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
+               </cursor>
+               <font>
+                  <Font name="Roboto" size="12.0" />
+               </font></MFXButton>
+            <Separator orientation="VERTICAL" />
             <MFXButton fx:id="previousButton" depthLevel="LEVEL1" disable="true" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
                <HBox.margin>
                   <Insets />
-               </HBox.margin></MFXButton>
+               </HBox.margin>
+               <font>
+                  <Font name="Roboto" size="12.0" />
+               </font></MFXButton>
             <MFXButton fx:id="nextButton" depthLevel="LEVEL1" disable="true" onAction="#handleNext" prefHeight="30.0" prefWidth="70.0" text="Next">
                <cursor>
                   <Cursor fx:constant="HAND" />
-               </cursor></MFXButton>
-            <Separator orientation="VERTICAL" prefHeight="200.0" />
+               </cursor>
+               <font>
+                  <Font name="Roboto" size="12.0" />
+               </font></MFXButton>
+            <Separator orientation="VERTICAL" />
             <MFXButton fx:id="startStopButton" depthLevel="LEVEL1" disable="true" onAction="#handleStartStopSlideshow" prefHeight="30.0" prefWidth="120.0" text="Start slideshow" translateX="-3.0">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
                <HBox.margin>
                   <Insets />
-               </HBox.margin></MFXButton>
-            <Label text="Delay:">
+               </HBox.margin>
                <font>
-                  <Font size="13.0" />
+                  <Font name="Roboto" size="12.0" />
+               </font></MFXButton>
+            <Label fx:id="delayLabel" disable="true" text="Delay:">
+               <font>
+                  <Font name="Roboto" size="12.0" />
                </font>
                <HBox.margin>
-                  <Insets />
+                  <Insets left="3.0" />
                </HBox.margin>
             </Label>
-            <Slider fx:id="slideshowSpeedSlider" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" prefWidth="120.0" showTickMarks="true" snapToTicks="true" translateX="-2.0" translateY="4.0" value="1.0" />
-            <Label fx:id="sliderValueLabel" text="1s" translateX="-4.0" />
+            <Slider fx:id="slideshowSpeedSlider" disable="true" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" prefWidth="100.0" showTickMarks="true" snapToTicks="true" translateX="-3.0" translateY="4.0" value="1.0" />
+            <Label fx:id="sliderValueLabel" disable="true" text="1s" translateX="-6.0">
+               <font>
+                  <Font name="Roboto" size="12.0" />
+               </font></Label>
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                <children>
                   <MFXButton fx:id="fullscreenButton" buttonType="RAISED" depthLevel="LEVEL1" ellipsisString="" onAction="#handleFullscreen" prefHeight="30.0" prefWidth="30.0" text=" ">
@@ -77,7 +92,7 @@
         </HBox>
     </top>
    <bottom>
-      <HBox fx:id="hBoxBottom" alignment="CENTER_LEFT" prefHeight="54.0" spacing="8.0" style="-fx-border-color: d2d2d2; -fx-background-color: f0f0f0;" visible="false" BorderPane.alignment="CENTER">
+      <HBox fx:id="hBoxBottom" alignment="CENTER_LEFT" prefHeight="50.0" spacing="8.0" style="-fx-background-color: rgba(0,0,0,0.85);" visible="false" BorderPane.alignment="CENTER">
          <opaqueInsets>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </opaqueInsets>
@@ -87,31 +102,31 @@
                   <Insets />
                </HBox.margin>
                <children>
-                  <Label fx:id="nameLabel" text="Name:" />
-                  <Label fx:id="pathLabel" text="Path:" />
+                  <Label fx:id="nameLabel" textFill="WHITE" />
+                  <Label fx:id="pathLabel" textFill="WHITE" />
                </children>
             </VBox>
             <VBox alignment="CENTER_LEFT">
                <children>
-                  <Label text="Red pixels:" />
-                  <Label fx:id="redCountLabel" />
+                  <Label text="Red pixels:" textFill="WHITE" />
+                  <Label fx:id="redCountLabel" textFill="WHITE" />
                </children>
             </VBox>
             <VBox alignment="CENTER_LEFT">
                <children>
-                  <Label text="Green pixels:" />
-                  <Label fx:id="greenCountLabel" />
+                  <Label text="Green pixels:" textFill="WHITE" />
+                  <Label fx:id="greenCountLabel" textFill="WHITE" />
                </children>
             </VBox>
             <VBox alignment="CENTER_LEFT">
                <children>
-                  <Label text="Blue pixels:" />
-                  <Label fx:id="blueCountLabel" />
+                  <Label text="Blue pixels:" textFill="WHITE" />
+                  <Label fx:id="blueCountLabel" textFill="WHITE" />
                </children>
             </VBox>
          </children>
          <padding>
-            <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
+            <Insets left="10.0" right="10.0" />
          </padding>
       </HBox>
    </bottom>
