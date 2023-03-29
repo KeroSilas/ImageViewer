@@ -1,4 +1,4 @@
-package net.kerosilas.imageviewer;
+package net.kerosilas.imageviewer.model;
 
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
@@ -7,10 +7,9 @@ import javafx.scene.paint.Color;
 
 import java.io.File;
 
-class PixelCounterTask extends Task<PixelColors> {
+public class PixelCounterTask extends Task<PixelColors> {
 
     private final File imageFile; // the image files to display
-    private int index; // the index of the current image file
 
     public PixelCounterTask(File imageFile) {
         this.imageFile = imageFile;

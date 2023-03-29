@@ -1,4 +1,4 @@
-package net.kerosilas.imageviewer;
+package net.kerosilas.imageviewer.model;
 
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
@@ -13,8 +13,6 @@ import java.io.File;
 public class ImagePane {
 
     private final HBox hBox;
-    private final ImageView imageView;
-    private final File file;
 
     public ImagePane(File file) {
         hBox = new HBox();
@@ -23,39 +21,27 @@ public class ImagePane {
         hBox.setStyle("-fx-background-radius: 5; " +
                 "-fx-background-color: rgba(0,0,0,0.05);");
         hBox.setAlignment(Pos.CENTER);
-        imageView = new ImageView();
-        imageView.setFitWidth(38);
-        imageView.setFitHeight(38);
-        imageView.setPreserveRatio(true);
-        imageView.setSmooth(true);
-        imageView.setImage(new Image(file.toURI().toString()));
+        ImageView imageView = new ImageView();
+        Image image = new Image(file.toURI().toString(), 38, 38, true, true); // Better to define these values for the image itself rather than the ImageView, saves memory and processing power
+        imageView.setImage(image);
+        imageView.setMouseTransparent(true);
         hBox.getChildren().add(imageView);
 
         setAnimation();
-
-        this.file = file;
-    }
-
-    public File getFile() {
-        return file;
     }
 
     public HBox getHBox() {
         return hBox;
     }
 
-    public ImageView getImageView() {
-        return imageView;
-    }
-
     private void setAnimation() {
         hBox.setOnMouseEntered(event -> {
             hBox.setStyle("-fx-background-radius: 5; " +
-                    "-fx-background-color: rgba(0,0,0,0.1);");
+                          "-fx-background-color: rgba(0,0,0,0.1);");
         });
         hBox.setOnMouseExited(event -> {
             hBox.setStyle("-fx-background-radius: 5; " +
-                    "-fx-background-color: rgba(0,0,0,0.05);");
+                          "-fx-background-color: rgba(0,0,0,0.05);");
         });
         hBox.setOnMousePressed(event -> {
             ScaleTransition st = new ScaleTransition(Duration.millis(70), hBox);
