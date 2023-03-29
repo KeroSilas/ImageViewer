@@ -1,20 +1,20 @@
-package net.kerosilas.imageviewer;
+package net.kerosilas.imageviewer.controller;
 
 import java.io.File;
 import java.util.List;
 
+import io.github.palexdev.materialfx.controls.MFXProgressSpinner;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.enums.ButtonType;
+import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -25,11 +25,16 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.util.Duration;
+import net.kerosilas.imageviewer.model.ImageManager;
+import net.kerosilas.imageviewer.model.ImageTask;
+import net.kerosilas.imageviewer.model.PixelCounterTask;
+import net.kerosilas.imageviewer.model.SlideshowTask;
 
 public class ImageViewerWindowController {
 
     @FXML private MFXButton startStopButton, loadButton, listButton, nextButton, previousButton, fullscreenButton;
     @FXML private MFXScrollPane imageScrollPane;
+    @FXML private MFXProgressSpinner progressSpinner;
     @FXML private TilePane imageTilePane;
     @FXML private Slider slideshowSpeedSlider;
     @FXML private ImageView imageView;
@@ -49,20 +54,29 @@ public class ImageViewerWindowController {
         List<File> files = fileChooser.showOpenMultipleDialog(new Stage());
 
         if (files != null && !files.isEmpty()) {
-            imageManager.addImages(files);
-            for (Node node : hBoxTop.getChildren()) {
-                node.setVisible(true);
-                if (node instanceof MFXButton) {
-                    ((MFXButton) node).setButtonType(ButtonType.RAISED);
-                }
-            }
-            imageTilePane.getChildren().clear();
-            imageTilePane.getChildren().addAll(imageManager.getImagePaneList());
-            hBoxBottom.setVisible(true);
+            progressSpinner.setVisible(true);
+            loadButton.setDisable(true);
             loadButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;");
-            root.setStyle("-fx-background-color: #131313;");
-            setupAnimations();
-            updateImage();
+
+            ImageTask imageTask = new ImageTask(files, 10);
+            progressSpinner.progressProperty().bind(imageTask.progressProperty());
+            imageTask.setOnSucceeded(e -> {
+                for (Node node : hBoxTop.getChildren()) {
+                    node.setVisible(true);
+                    if (node instanceof MFXButton) {
+                        ((MFXButton) node).setButtonType(ButtonType.RAISED);
+                    }
+                }
+                imageTilePane.getChildren().clear();
+                imageTilePane.getChildren().addAll(imageManager.getImagePaneList());
+                updateImage();
+                hBoxBottom.setVisible(true);
+                progressSpinner.setVisible(false);
+                loadButton.setDisable(false);
+                root.setStyle("-fx-background-color: #131313;");
+                setupAnimations();
+            });
+            new Thread(imageTask).start();
         }
     }
 
@@ -103,14 +117,6 @@ public class ImageViewerWindowController {
         if (event.getClickCount() == 2) {
             Stage stage = (Stage) root.getScene().getWindow();
             stage.setFullScreen(!stage.isFullScreen());
-        }
-    }
-
-    @FXML private void handleImageListClick(MouseEvent event) {
-        // doesnt work
-        if (event.getSource() instanceof HBox hBox) {
-            currentImageIndex = imageManager.getIndex(hBox);
-            updateImage();
         }
     }
 
@@ -158,6 +164,14 @@ public class ImageViewerWindowController {
                     listButton.fire();
                     e.consume();
                 }
+            }
+        });
+
+        imageTilePane.setOnMouseClicked(event -> {
+            int index = imageTilePane.getChildren().indexOf(event.getTarget ());
+            if(index != -1) {
+                currentImageIndex = index;
+                updateImage();
             }
         });
     }
@@ -230,9 +244,9 @@ public class ImageViewerWindowController {
     private void countPixelColors() {
         PixelCounterTask pixelCounterTask = new PixelCounterTask(imageManager.getFileList().get(currentImageIndex));
         pixelCounterTask.valueProperty().addListener((ov, oldValue, newValue) -> {
-            redCountLabel.setText(String.format("%d (%.2f%%)", newValue.getRedCount(), newValue.getRedPercentage() * 100));
-            greenCountLabel.setText(String.format("%d (%.2f%%)", newValue.getGreenCount(), newValue.getGreenPercentage() * 100));
-            blueCountLabel.setText(String.format("%d (%.2f%%)", newValue.getBlueCount(), newValue.getBluePercentage() * 100));
+            redCountLabel.setText(String.format("%d (%.2f%%)", newValue.redCount(), newValue.getRedPercentage() * 100));
+            greenCountLabel.setText(String.format("%d (%.2f%%)", newValue.greenCount(), newValue.getGreenPercentage() * 100));
+            blueCountLabel.setText(String.format("%d (%.2f%%)", newValue.blueCount(), newValue.getBluePercentage() * 100));
         });
         Thread thread = new Thread(pixelCounterTask);
         thread.setDaemon(true);
@@ -240,31 +254,13 @@ public class ImageViewerWindowController {
     }
 
     private void setupAnimations() {
-        hBoxTop.setTranslateY(-50);
-        hBoxBottom.setTranslateY(50);
-        imageScrollPane.setTranslateY(-128);
-
         TranslateTransition ttBottom = new TranslateTransition(Duration.millis(70), hBoxBottom);
         TranslateTransition ttTop = new TranslateTransition(Duration.millis(70), hBoxTop);
         TranslateTransition ttList = new TranslateTransition(Duration.millis(70), imageScrollPane);
+        PauseTransition pause = new PauseTransition(Duration.millis(2500));
 
-        root.setOnMouseEntered(event -> {
-            ttTop.setByY(50);
-            ttBottom.setByY(-50);
-            ttList.setByY(128);
-            ttTop.play();
-            ttBottom.play();
-            ttList.play();
-
-            ttTop.setOnFinished(e ->
-                    hBoxTop.setTranslateY(0));
-            ttBottom.setOnFinished(e ->
-                    hBoxBottom.setTranslateY(0));
-            ttList.setOnFinished(e ->
-                    imageScrollPane.setTranslateX(0));
-        });
-
-        root.setOnMouseExited(event -> {
+        pause.play();
+        pause.setOnFinished(event -> {
             ttTop.setByY(-50);
             ttBottom.setByY(50);
             ttList.setByY(-128);
@@ -272,12 +268,19 @@ public class ImageViewerWindowController {
             ttBottom.play();
             ttList.play();
 
-            ttTop.setOnFinished(e ->
-                    hBoxTop.setTranslateY(-50));
-            ttBottom.setOnFinished(e ->
-                    hBoxBottom.setTranslateY(50));
-            ttList.setOnFinished(e ->
-                    imageScrollPane.setTranslateY(-128));
+            pause.playFromStart();
+        });
+
+        root.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+            if (imageScrollPane.getTranslateY() != 0) {
+                ttTop.setByY(50);
+                ttBottom.setByY(-50);
+                ttList.setByY(128);
+                ttTop.play();
+                ttBottom.play();
+                ttList.play();
+            }
+            pause.playFromStart();
         });
     }
 }
