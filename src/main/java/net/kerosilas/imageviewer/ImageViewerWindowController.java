@@ -3,8 +3,7 @@ package net.kerosilas.imageviewer;
 import java.io.File;
 import java.util.List;
 
-import io.github.palexdev.materialfx.controls.MFXListView;
-import io.github.palexdev.materialfx.effects.DepthLevel;
+import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.enums.ButtonType;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -16,6 +15,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -27,8 +28,8 @@ import javafx.util.Duration;
 
 public class ImageViewerWindowController {
 
-    @FXML private MFXButton startStopButton, loadButton, listButton;
-    @FXML private MFXListView<File> imageListView;
+    @FXML private MFXButton startStopButton, loadButton, listButton, nextButton, previousButton, fullscreenButton;
+    @FXML private MFXScrollPane imageListPane;
     @FXML private Slider slideshowSpeedSlider;
     @FXML private ImageView imageView;
     @FXML private Label sliderValueLabel, nameLabel, pathLabel, blueCountLabel, greenCountLabel, redCountLabel;
@@ -86,14 +87,12 @@ public class ImageViewerWindowController {
     }
 
     @FXML private void handleList() {
-        if (imageListView.isVisible()) {
-            imageListView.setVisible(false);
+        if (imageListPane.isVisible()) {
+            imageListPane.setVisible(false);
             listButton.setStyle("-fx-background-color: #ffffff;");
-            listButton.setDepthLevel(DepthLevel.LEVEL1);
         } else {
-            imageListView.setVisible(true);
-            listButton.setStyle("-fx-background-color: #e5e5e5;");
-            listButton.setDepthLevel(DepthLevel.LEVEL3);
+            imageListPane.setVisible(true);
+            listButton.setStyle("-fx-background-color: #d9d9d9;");
         }
     }
 
@@ -124,14 +123,26 @@ public class ImageViewerWindowController {
         slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) ->
                 sliderValueLabel.setText(String.format("%ds", newValue.intValue())));
 
-        imageListView.setItems(imageFiles);
-        imageListView.setStyle("-fx-background-color: #131313; -fx-text-fill: #ffffff;");
-        imageListView.getSelectionModel().setAllowsMultipleSelection(false);
-        imageListView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                stopSlideshow();
-                currentImageIndex = imageFiles.indexOf(imageListView.getSelectionModel().getSelectedValues().get(0));
-                updateImage();
+        root.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.D) {
+                nextButton.fire();
+                e.consume();
+            }
+            if (e.getCode() == KeyCode.A) {
+                previousButton.fire();
+                e.consume();
+            }
+            if (e.getCode() == KeyCode.S) {
+                startStopButton.fire();
+                e.consume();
+            }
+            if (e.getCode() == KeyCode.F) {
+                fullscreenButton.fire();
+                e.consume();
+            }
+            if (e.getCode() == KeyCode.L) {
+                listButton.fire();
+                e.consume();
             }
         });
     }
@@ -195,8 +206,6 @@ public class ImageViewerWindowController {
 
     private void updateImage() {
         imageView.setImage(new Image(imageFiles.get(currentImageIndex).toURI().toString()));
-        imageListView.getSelectionModel().selectIndex(currentImageIndex);
-        imageListView.scrollTo(currentImageIndex);
         File file = new File(imageFiles.get(currentImageIndex).toURI().toString());
         nameLabel.setText(file.getName().replace("%20", " "));
         pathLabel.setText(file.getParentFile().getPath().substring(6));
@@ -218,16 +227,16 @@ public class ImageViewerWindowController {
     private void setupAnimations() {
         hBoxTop.setTranslateY(-50);
         hBoxBottom.setTranslateY(50);
-        imageListView.setTranslateX(-200);
+        imageListPane.setTranslateY(-128);
 
         TranslateTransition ttBottom = new TranslateTransition(Duration.millis(70), hBoxBottom);
         TranslateTransition ttTop = new TranslateTransition(Duration.millis(70), hBoxTop);
-        TranslateTransition ttList = new TranslateTransition(Duration.millis(70), imageListView);
+        TranslateTransition ttList = new TranslateTransition(Duration.millis(70), imageListPane);
 
         root.setOnMouseEntered(event -> {
             ttTop.setByY(50);
             ttBottom.setByY(-50);
-            ttList.setByX(200);
+            ttList.setByY(128);
             ttTop.play();
             ttBottom.play();
             ttList.play();
@@ -237,13 +246,13 @@ public class ImageViewerWindowController {
             ttBottom.setOnFinished(e ->
                     hBoxBottom.setTranslateY(0));
             ttList.setOnFinished(e ->
-                    imageListView.setTranslateX(0));
+                    imageListPane.setTranslateX(0));
         });
 
         root.setOnMouseExited(event -> {
             ttTop.setByY(-50);
             ttBottom.setByY(50);
-            ttList.setByX(-200);
+            ttList.setByY(-128);
             ttTop.play();
             ttBottom.play();
             ttList.play();
@@ -253,7 +262,7 @@ public class ImageViewerWindowController {
             ttBottom.setOnFinished(e ->
                     hBoxBottom.setTranslateY(50));
             ttList.setOnFinished(e ->
-                    imageListView.setTranslateX(-200));
+                    imageListPane.setTranslateY(-128));
         });
     }
 }
