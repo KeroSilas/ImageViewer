@@ -199,7 +199,9 @@ public class ImageViewerWindowController {
     }
 
     private void updateImage() {
-        imageView.setImage(imageManager.getCurrentImage());
+        new Thread(() -> {
+            imageView.setImage(imageManager.getCurrentImage());
+        }).start();
         File file = imageManager.getCurrentFile();
         Platform.runLater(() -> { // run on JavaFX thread
             nameLabel.setText(file.getName().replace("%20", " "));
