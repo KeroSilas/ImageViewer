@@ -1,27 +1,6 @@
-package net.kerosilas.imageviewer;
+package net.kerosilas.imageviewer.model;
 
-public class PixelColors {
-    private final int redCount;
-    private final int greenCount;
-    private final int blueCount;
-
-    public PixelColors(int redCount, int greenCount, int blueCount) {
-        this.redCount = redCount;
-        this.greenCount = greenCount;
-        this.blueCount = blueCount;
-    }
-
-    public int getRedCount() {
-        return redCount;
-    }
-
-    public int getGreenCount() {
-        return greenCount;
-    }
-
-    public int getBlueCount() {
-        return blueCount;
-    }
+public record PixelColors(int redCount, int greenCount, int blueCount) {
 
     public int getTotalCount() {
         return redCount + greenCount + blueCount;

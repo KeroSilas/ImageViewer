@@ -17,7 +17,8 @@ public class ImageViewerApplication extends Application {
         stage.getIcons().add(new Image("file:src/main/resources/net/kerosilas/imageviewer/logo.png"));
         stage.setMinWidth(740);
         stage.setMinHeight(240);
-        stage.setHeight(446);
+        stage.setWidth(1080);
+        stage.setHeight(638);
         stage.setScene(scene);
         stage.show();
     }

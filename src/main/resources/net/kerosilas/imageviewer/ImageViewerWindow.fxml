@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
-<?import io.github.palexdev.materialfx.controls.MFXListView?>
+<?import io.github.palexdev.materialfx.controls.MFXProgressSpinner?>
+<?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
@@ -11,10 +12,13 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" depthTest="ENABLE" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="720.0" style="-fx-background-color: #cccccc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.kerosilas.imageviewer.ImageViewerWindowController">
+<BorderPane fx:id="root" depthTest="ENABLE" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="720.0" style="-fx-background-color: #cccccc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.kerosilas.imageviewer.controller.ImageViewerWindowController">
     <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
@@ -39,6 +43,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
                   </MFXButton>
                   <Separator maxHeight="30.0" orientation="VERTICAL" visible="false" />
                   <MFXButton fx:id="previousButton" depthLevel="LEVEL1" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous" visible="false">
@@ -116,6 +123,17 @@
                   <Insets bottom="8.0" left="10.0" right="10.0" top="8.0" />
                </padding>
               </HBox>
+            <MFXScrollPane fx:id="imageScrollPane" fitToHeight="true" focusTraversable="false" hbarPolicy="NEVER" pannable="true" style="-fx-background-radius: 5; -fx-background-color: f3f3f3;" vbarPolicy="NEVER" viewOrder="1.0" visible="false">
+               <content>
+                  <TilePane fx:id="imageTilePane" alignment="CENTER_LEFT" hgap="8.0" orientation="VERTICAL" prefColumns="0" prefRows="1" />
+               </content>
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </MFXScrollPane>
          </children>
       </VBox>
     </top>
@@ -161,15 +179,25 @@
    <center>
       <HBox fx:id="pane" alignment="CENTER" onMouseClicked="#handleImageClick" BorderPane.alignment="CENTER">
          <children>
-                <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
+            <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <MFXProgressSpinner fx:id="progressSpinner" visible="false">
+                     <color1>
+                        <Color red="0.5411764979362488" green="0.5411764979362488" blue="0.5411764979362488" />
+                     </color1>
+                     <color2>
+                        <Color red="0.5411764979362488" green="0.5411764979362488" blue="0.5411764979362488" />
+                     </color2>
+                     <color3>
+                        <Color red="0.5411764979362488" green="0.5411764979362488" blue="0.5411764979362488" />
+                     </color3>
+                     <color4>
+                        <Color red="0.5411764979362488" green="0.5411764979362488" blue="0.5411764979362488" />
+                     </color4></MFXProgressSpinner>
+                      <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </StackPane>
          </children>
       </HBox>
    </center>
-   <left>
-      <MFXListView fx:id="imageListView" depthLevel="LEVEL3" maxHeight="1.7976931348623157E308" prefWidth="175.0" visible="false" BorderPane.alignment="CENTER">
-         <BorderPane.margin>
-            <Insets bottom="10.0" left="10.0" top="10.0" />
-         </BorderPane.margin>
-      </MFXListView>
-   </left>
 </BorderPane>
