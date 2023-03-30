@@ -81,6 +81,9 @@ public class ImageViewerWindowController {
 
         slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> { // Add a listener to the slider that will format the value and display it in a label
             sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
+            if (slideshowTask != null) {
+                slideshowTask.setDelay(newValue.intValue());
+            }
         });
     }
 
@@ -123,7 +126,7 @@ public class ImageViewerWindowController {
             thread.setDaemon(true);
             thread.start();
 
-            slideshowSpeedSlider.setDisable(true);
+            //slideshowSpeedSlider.setDisable(true);
             startStopButton.setText("Stop");
         }
     }
@@ -134,7 +137,7 @@ public class ImageViewerWindowController {
             slideshowTask.cancel();
             slideshowTask = null;
 
-            slideshowSpeedSlider.setDisable(false);
+            //slideshowSpeedSlider.setDisable(false);
             startStopButton.setText("Start");
         }
     }

@@ -9,7 +9,7 @@ import java.util.List;
 class SlideshowTask extends Task<Image> {
 
     private final List<File> imageFiles; // the image files to display
-    private final int delay; // the delay between images in seconds
+    private int delay; // the delay between images in seconds
     private int index; // the index of the current image file
 
     public SlideshowTask(List<File> imageFiles, int delay, int index) {
@@ -20,6 +20,10 @@ class SlideshowTask extends Task<Image> {
 
     public int getIndex() {
         return index;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 
     @Override
