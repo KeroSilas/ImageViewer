@@ -13,7 +13,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -43,7 +42,6 @@ public class ImageViewerWindowController {
     @FXML private BorderPane root;
 
     private ImageManager imageManager;
-    private int currentImageIndex = 0;
     private SlideshowTask slideshowTask;
 
     @FXML private void handleLoad() {
@@ -80,12 +78,12 @@ public class ImageViewerWindowController {
 
     @FXML private void handlePrevious() {
         stopSlideshow();
-        displayPrevImage();
+        imageManager.previousImage();
     }
 
     @FXML private void handleNext() {
         stopSlideshow();
-        displayNextImage();
+        imageManager.nextImage();
     }
 
     @FXML private void handleStartStopSlideshow() {
@@ -120,12 +118,14 @@ public class ImageViewerWindowController {
 
     public void initialize() {
         imageManager = ImageManager.getInstance();
+        imageManager.addPropertyChangeListener(e -> updateImage());
 
         Platform.runLater(() -> {
             imageView.setFitHeight(imageView.getScene().getHeight());
             imageView.setFitWidth(imageView.getScene().getWidth());
             pane.setTranslateY((imageView.getScene().getHeight()) / 2);
             pane.setTranslateX((imageView.getScene().getWidth()) / 2);
+
             imageView.getScene().heightProperty().addListener((observable, oldValue, newValue) -> {
                     imageView.setFitHeight((newValue.doubleValue()));
                     pane.setTranslateY((newValue.doubleValue()) / 2);
@@ -140,9 +140,8 @@ public class ImageViewerWindowController {
 
         slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
-            if (slideshowTask != null) {
+            if (slideshowTask != null)
                 slideshowTask.setDelay(newValue.intValue());
-            }
         });
 
         root.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
@@ -174,47 +173,15 @@ public class ImageViewerWindowController {
             int index = imageTilePane.getChildren().indexOf(event.getTarget ());
             if(index != -1) {
                 stopSlideshow();
-                currentImageIndex = index;
+                imageManager.setCurrentIndex(index);
                 updateImage();
             }
         });
     }
 
-    private void displayNextImage() {
-        if (!imageManager.getFileList().isEmpty()) {
-            if (currentImageIndex == imageManager.getFileList().size() - 1) {
-                currentImageIndex = 0;
-            } else {
-                currentImageIndex++;
-            }
-            updateImage();
-        }
-    }
-
-    private void displayPrevImage() {
-        if (!imageManager.getFileList().isEmpty()) {
-            if (currentImageIndex == 0) {
-                currentImageIndex = imageManager.getFileList().size() - 1;
-            } else {
-                currentImageIndex--;
-            }
-            updateImage();
-        }
-    }
-
     private void startSlideshow() {
         if (slideshowTask == null) {
-            slideshowTask = new SlideshowTask(imageManager.getFileList(), (int) slideshowSpeedSlider.getValue(), currentImageIndex);
-            slideshowTask.valueProperty().addListener((ov, oldValue, newValue) -> {
-                imageView.setImage(newValue);
-                File file = new File(newValue.getUrl());
-                nameLabel.setText(file.getName().replace("%20", " "));
-                pathLabel.setText(file.getParentFile().getPath().substring(6));
-                if (newValue != oldValue) {
-                    currentImageIndex = slideshowTask.getIndex();
-                    countPixelColors();
-                }
-            });
+            slideshowTask = new SlideshowTask((int) slideshowSpeedSlider.getValue());
             Thread thread = new Thread(slideshowTask);
             thread.setDaemon(true);
             thread.start();
@@ -226,7 +193,6 @@ public class ImageViewerWindowController {
 
     private void stopSlideshow() {
         if (slideshowTask != null) {
-            currentImageIndex = slideshowTask.getIndex();
             slideshowTask.cancel();
             slideshowTask = null;
 
@@ -236,15 +202,17 @@ public class ImageViewerWindowController {
     }
 
     private void updateImage() {
-        imageView.setImage(new Image(imageManager.getFileList().get(currentImageIndex).toURI().toString()));
-        File file = new File(imageManager.getFileList().get(currentImageIndex).toURI().toString());
-        nameLabel.setText(file.getName().replace("%20", " "));
-        pathLabel.setText(file.getParentFile().getPath().substring(6));
+        imageView.setImage(imageManager.getCurrentImage());
+        File file = imageManager.getCurrentFile();
+        Platform.runLater(() -> { // run on JavaFX thread
+            nameLabel.setText(file.getName().replace("%20", " "));
+            pathLabel.setText(file.getParentFile().getPath().substring(6));
+        });
         countPixelColors();
     }
 
     private void countPixelColors() {
-        PixelCounterTask pixelCounterTask = new PixelCounterTask(imageManager.getFileList().get(currentImageIndex));
+        PixelCounterTask pixelCounterTask = new PixelCounterTask(imageManager.getCurrentFile());
         pixelCounterTask.valueProperty().addListener((ov, oldValue, newValue) -> {
             redCountLabel.setText(String.format("%d (%.2f%%)", newValue.redCount(), newValue.getRedPercentage() * 100));
             greenCountLabel.setText(String.format("%d (%.2f%%)", newValue.greenCount(), newValue.getGreenPercentage() * 100));
