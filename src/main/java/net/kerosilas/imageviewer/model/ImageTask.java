@@ -25,7 +25,7 @@ public class ImageTask extends Task<Boolean> {
         ImageManager manager = ImageManager.getInstance();
         boolean success = true;
         int count = 0;
-        // create a fixed thread pool executor
+
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         // create a list of futures to store the subtask results
         List<Future<Boolean>> futures = new ArrayList<>();

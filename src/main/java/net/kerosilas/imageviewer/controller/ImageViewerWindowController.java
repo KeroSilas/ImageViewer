@@ -67,14 +67,12 @@ public class ImageViewerWindowController {
                         ((MFXButton) node).setButtonType(ButtonType.RAISED);
                     }
                 }
-                imageTilePane.getChildren().clear();
-                imageTilePane.getChildren().addAll(imageManager.getImagePaneList());
+                imageTilePane.getChildren().setAll(imageManager.getImagePaneList());
                 updateImage();
                 hBoxBottom.setVisible(true);
                 progressSpinner.setVisible(false);
                 loadButton.setDisable(false);
                 root.setStyle("-fx-background-color: #131313;");
-                setupAnimations();
             });
             new Thread(imageTask).start();
         }
@@ -136,6 +134,7 @@ public class ImageViewerWindowController {
                     imageView.setFitWidth((newValue.doubleValue()));
                     pane.setTranslateX((newValue.doubleValue()) / 2);
             });
+            setupAnimations();
         });
         pane.toBack();
 
@@ -260,7 +259,7 @@ public class ImageViewerWindowController {
         TranslateTransition ttBottom = new TranslateTransition(Duration.millis(70), hBoxBottom);
         TranslateTransition ttTop = new TranslateTransition(Duration.millis(70), hBoxTop);
         TranslateTransition ttList = new TranslateTransition(Duration.millis(70), imageScrollPane);
-        PauseTransition pause = new PauseTransition(Duration.millis(2500));
+        PauseTransition pause = new PauseTransition(Duration.millis(3000));
 
         pause.play();
         pause.setOnFinished(event -> {
