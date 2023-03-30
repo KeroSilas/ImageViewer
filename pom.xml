@@ -14,6 +14,13 @@
         <junit.version>5.9.1</junit.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>local-repo</id>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -36,6 +43,20 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>example</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/materialfx-11.13.5.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>example</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/virtualizedfx-11.2.6.jar</systemPath>
         </dependency>
     </dependencies>
 
