@@ -77,12 +77,10 @@ public class ImageViewerWindowController {
     }
 
     @FXML private void handlePrevious() {
-        stopSlideshow();
         imageManager.previousImage();
     }
 
     @FXML private void handleNext() {
-        stopSlideshow();
         imageManager.nextImage();
     }
 
@@ -172,7 +170,6 @@ public class ImageViewerWindowController {
         imageTilePane.setOnMouseClicked(event -> {
             int index = imageTilePane.getChildren().indexOf(event.getTarget ());
             if(index != -1) {
-                stopSlideshow();
                 imageManager.setCurrentIndex(index);
                 updateImage();
             }
