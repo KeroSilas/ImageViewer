@@ -43,6 +43,9 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
                   </MFXButton>
                   <Separator maxHeight="30.0" orientation="VERTICAL" visible="false" />
                   <MFXButton fx:id="previousButton" depthLevel="LEVEL1" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous" visible="false">

@@ -139,8 +139,12 @@ public class ImageViewerWindowController {
         });
         pane.toBack();
 
-        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) ->
-                sliderValueLabel.setText(String.format("%ds", newValue.intValue())));
+        slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
+            if (slideshowTask != null) {
+                slideshowTask.setDelay(newValue.intValue());
+            }
+        });
 
         root.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             switch (e.getCode()) {
@@ -215,7 +219,6 @@ public class ImageViewerWindowController {
             thread.setDaemon(true);
             thread.start();
 
-            slideshowSpeedSlider.setDisable(true);
             startStopButton.setText("Stop slideshow");
             startStopButton.setStyle("-fx-background-color: #bd2323; -fx-text-fill: #ffffff;");
         }
@@ -227,7 +230,6 @@ public class ImageViewerWindowController {
             slideshowTask.cancel();
             slideshowTask = null;
 
-            slideshowSpeedSlider.setDisable(false);
             startStopButton.setText("Start slideshow");
             startStopButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;");
         }
@@ -271,7 +273,7 @@ public class ImageViewerWindowController {
             pause.playFromStart();
         });
 
-        root.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+        root.getScene().setOnMouseMoved(event -> {
             if (imageScrollPane.getTranslateY() != 0) {
                 ttTop.setByY(50);
                 ttBottom.setByY(-50);
@@ -282,5 +284,42 @@ public class ImageViewerWindowController {
             }
             pause.playFromStart();
         });
+
+        root.getScene().setOnMouseEntered(event -> {
+            if (imageScrollPane.getTranslateY() != 0) {
+                ttTop.setByY(50);
+                ttBottom.setByY(-50);
+                ttList.setByY(128);
+                ttTop.play();
+                ttBottom.play();
+                ttList.play();
+            }
+            pause.playFromStart();
+        });
+
+        root.getScene().setOnMouseExited(event -> {
+            if (imageScrollPane.getTranslateY() == 0) {
+                ttTop.setByY(-50);
+                ttBottom.setByY(50);
+                ttList.setByY(-128);
+                ttTop.play();
+                ttBottom.play();
+                ttList.play();
+            }
+            pause.playFromStart();
+        });
+
+        slideshowSpeedSlider.setOnMouseDragged(event -> {
+            pause.playFromStart();
+        });
+
+        for (Node node : hBoxTop.getChildren()) {
+            node.setOnMouseEntered(event -> {
+                pause.stop();
+            });
+            node.setOnMouseExited(event -> {
+                pause.playFromStart();
+            });
+        }
     }
 }
