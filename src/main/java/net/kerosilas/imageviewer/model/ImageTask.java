@@ -63,7 +63,7 @@ class SubTask implements Callable<Boolean> {
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Boolean call() {
         boolean success = true;
         for (File file : files) {
             success = success && imageManager.addImage(file);

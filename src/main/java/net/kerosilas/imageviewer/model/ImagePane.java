@@ -29,22 +29,20 @@ public class ImagePane {
         imageView.setMouseTransparent(true);
         hBox.getChildren().add(imageView);
 
-        setAnimation();
+        setupAnimations();
     }
 
     public HBox getHBox() {
         return hBox;
     }
 
-    private void setAnimation() {
-        hBox.setOnMouseEntered(event -> {
-            hBox.setStyle("-fx-background-radius: 5; " +
-                          "-fx-background-color: rgba(0,0,0,0.1);");
-        });
-        hBox.setOnMouseExited(event -> {
-            hBox.setStyle("-fx-background-radius: 5; " +
-                          "-fx-background-color: rgba(0,0,0,0.05);");
-        });
+    private void setupAnimations() {
+        hBox.setOnMouseEntered(event ->
+                hBox.setStyle("-fx-background-radius: 5; " +
+                              "-fx-background-color: rgba(0,0,0,0.1);"));
+        hBox.setOnMouseExited(event ->
+                hBox.setStyle("-fx-background-radius: 5; " +
+                              "-fx-background-color: rgba(0,0,0,0.05);"));
         hBox.setOnMousePressed(event -> {
             ScaleTransition st = new ScaleTransition(Duration.millis(70), hBox);
             st.setToX(0.9);

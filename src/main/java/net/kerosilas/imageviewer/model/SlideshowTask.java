@@ -1,27 +1,15 @@
 package net.kerosilas.imageviewer.model;
 
 import javafx.concurrent.Task;
-import javafx.scene.image.Image;
 
-import java.io.File;
-import java.util.List;
-
-public class SlideshowTask extends Task<Image> {
+public class SlideshowTask extends Task<Void> {
 
     private final ImageManager imageManager;
-    private final List<File> imageFiles; // the image files to display
-    private int delay; // the delay between images in seconds
-    private int index; // the index of the current image file
+    private int delay;
 
-    public SlideshowTask(List<File> imageFiles, int delay, int index) {
+    public SlideshowTask(int delay) {
         this.imageManager = ImageManager.getInstance();
-        this.imageFiles = imageFiles;
         this.delay = delay;
-        this.index = index;
-    }
-
-    public int getIndex() {
-        return index;
     }
 
     public void setDelay(int delay) {
@@ -29,14 +17,8 @@ public class SlideshowTask extends Task<Image> {
     }
 
     @Override
-    protected Image call() {
-        while (!isCancelled()) { // loop until cancelled
-
-            // load the image from the file and update the value property
-            Image image = new Image(imageManager.getFileList().get(index).toURI().toString());
-            updateValue(image);
-
-            // sleep for the specified delay or until interrupted
+    protected Void call() {
+        while (!isCancelled()) {
             try {
                 Thread.sleep(delay * 1000L);
             } catch (InterruptedException e) {
@@ -44,11 +26,9 @@ public class SlideshowTask extends Task<Image> {
                     break;
                 }
             }
-
-            // increment the index or wrap around if it reaches the end of the list
-            index = (index + 1) % imageFiles.size();
+            imageManager.nextImage();
         }
 
-        return null; // return null when cancelled or done
+        return null;
     }
 }
