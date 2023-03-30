@@ -3,6 +3,7 @@ package net.kerosilas.imageviewer.model;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -21,6 +22,7 @@ public class ImagePane {
         hBox.setStyle("-fx-background-radius: 5; " +
                 "-fx-background-color: rgba(0,0,0,0.05);");
         hBox.setAlignment(Pos.CENTER);
+        hBox.setCursor(Cursor.HAND);
         ImageView imageView = new ImageView();
         Image image = new Image(file.toURI().toString(), 38, 38, true, true); // Better to define these values for the image itself rather than the ImageView, saves memory and processing power
         imageView.setImage(image);
