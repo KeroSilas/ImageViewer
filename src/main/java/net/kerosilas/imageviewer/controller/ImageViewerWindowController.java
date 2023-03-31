@@ -24,10 +24,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.util.Duration;
-import net.kerosilas.imageviewer.model.ImageManager;
-import net.kerosilas.imageviewer.model.ImageTask;
-import net.kerosilas.imageviewer.model.PixelCounterTask;
-import net.kerosilas.imageviewer.model.SlideshowTask;
+import net.kerosilas.imageviewer.model.*;
 
 public class ImageViewerWindowController {
 
@@ -211,7 +208,7 @@ public class ImageViewerWindowController {
     }
 
     private void countPixelColors() {
-        PixelCounterTask pixelCounterTask = new PixelCounterTask(imageManager.getCurrentFile());
+        PixelCounterTask pixelCounterTask = new PixelCounterTask();
         pixelCounterTask.valueProperty().addListener((ov, oldValue, newValue) -> {
             redCountLabel.setText(String.format("%d (%.2f%%)", newValue.redCount(), newValue.getRedPercentage() * 100));
             greenCountLabel.setText(String.format("%d (%.2f%%)", newValue.greenCount(), newValue.getGreenPercentage() * 100));
