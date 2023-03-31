@@ -9,15 +9,15 @@ import java.io.File;
 
 public class PixelCounterTask extends Task<PixelColors> {
 
-    private final File imageFile; // the image files to display
+    private final ImageManager imageManager;
 
-    public PixelCounterTask(File imageFile) {
-        this.imageFile = imageFile;
+    public PixelCounterTask() {
+        imageManager = ImageManager.getInstance();
     }
 
     @Override
     protected PixelColors call() {
-        Image image = new Image(imageFile.toURI().toString());
+        Image image = imageManager.getCurrentImage();
         PixelReader pixelReader = image.getPixelReader();
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();

@@ -11,10 +11,10 @@ import java.io.IOException;
 public class ImageViewerApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(ImageViewerApplication.class.getResource("ImageViewerWindow.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(ImageViewerApplication.class.getResource("views/ImageViewerWindow.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Image Viewer");
-        stage.getIcons().add(new Image("file:src/main/resources/net/kerosilas/imageviewer/logo.png"));
+        stage.getIcons().add(new Image("file:src/main/resources/net/kerosilas/imageviewer/images/logo.png"));
         stage.setMinWidth(740);
         stage.setMinHeight(240);
         stage.setWidth(1080);
