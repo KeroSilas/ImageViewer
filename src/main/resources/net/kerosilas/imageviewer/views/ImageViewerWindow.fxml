@@ -32,7 +32,7 @@
                         <Font name="Roboto" size="12.0" />
                      </font>
                   </MFXButton>
-                  <MFXButton fx:id="listButton" buttonType="RAISED" depthLevel="LEVEL1" ellipsisString="" onAction="#handleList" prefHeight="30.0" prefWidth="30.0" text=" " visible="false">
+                  <MFXButton fx:id="listButton" depthLevel="LEVEL1" disable="true" ellipsisString="" onAction="#handleList" prefHeight="30.0" prefWidth="30.0" text=" ">
                      <font>
                         <Font size="1.0" />
                      </font>
@@ -47,8 +47,8 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </MFXButton>
-                  <Separator maxHeight="30.0" orientation="VERTICAL" visible="false" />
-                  <MFXButton fx:id="previousButton" depthLevel="LEVEL1" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous" visible="false">
+                  <Separator disable="true" maxHeight="30.0" orientation="VERTICAL" />
+                  <MFXButton fx:id="previousButton" depthLevel="LEVEL1" disable="true" onAction="#handlePrevious" prefHeight="30.0" prefWidth="70.0" text="Previous">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -59,7 +59,7 @@
                         <Font name="Roboto" size="12.0" />
                      </font>
                   </MFXButton>
-                  <MFXButton fx:id="nextButton" depthLevel="LEVEL1" onAction="#handleNext" prefHeight="30.0" prefWidth="70.0" text="Next" visible="false">
+                  <MFXButton fx:id="nextButton" depthLevel="LEVEL1" disable="true" onAction="#handleNext" prefHeight="30.0" prefWidth="70.0" text="Next">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -67,8 +67,8 @@
                         <Font name="Roboto" size="12.0" />
                      </font>
                   </MFXButton>
-                  <Separator maxHeight="30.0" orientation="VERTICAL" visible="false" />
-                  <MFXButton fx:id="startStopButton" depthLevel="LEVEL1" onAction="#handleStartStopSlideshow" prefHeight="30.0" prefWidth="120.0" text="Start slideshow" translateX="-3.0" visible="false">
+                  <Separator disable="true" maxHeight="30.0" orientation="VERTICAL" />
+                  <MFXButton fx:id="toggleSlideshowButton" depthLevel="LEVEL1" disable="true" onAction="#handleToggleSlideshow" prefHeight="30.0" prefWidth="120.0" text="Start slideshow" translateX="-3.0">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -79,7 +79,7 @@
                         <Font name="Roboto" size="12.0" />
                      </font>
                   </MFXButton>
-                  <Label fx:id="delayLabel" text="Delay:" visible="false">
+                  <Label fx:id="delayLabel" disable="true" text="Delay:">
                      <font>
                         <Font name="Roboto" size="12.0" />
                      </font>
@@ -87,11 +87,11 @@
                         <Insets left="3.0" />
                      </HBox.margin>
                   </Label>
-                  <Slider fx:id="slideshowSpeedSlider" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" prefWidth="100.0" showTickMarks="true" snapToTicks="true" translateX="-3.0" translateY="4.0" value="1.0" visible="false">
+                  <Slider fx:id="slideshowSpeedSlider" disable="true" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" prefWidth="100.0" showTickMarks="true" snapToTicks="true" translateX="-3.0" translateY="4.0" value="1.0">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor></Slider>
-                  <Label fx:id="sliderValueLabel" text="1s" translateX="-6.0" visible="false">
+                  <Label fx:id="sliderValueLabel" disable="true" text="1s" translateX="-6.0">
                      <font>
                         <Font name="Roboto" size="12.0" />
                      </font>
@@ -177,7 +177,7 @@
       </HBox>
    </bottom>
    <center>
-      <HBox fx:id="pane" alignment="CENTER" onMouseClicked="#handleImageClick" BorderPane.alignment="CENTER">
+      <HBox fx:id="imageHBox" alignment="CENTER" onMouseClicked="#handleImageClick" BorderPane.alignment="CENTER">
          <children>
             <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                <children>
