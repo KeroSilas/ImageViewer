@@ -1,9 +1,11 @@
-package net.kerosilas.imageviewer.model;
+package net.kerosilas.imageviewer.tasks;
 
 import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
+import net.kerosilas.imageviewer.model.ImageManager;
+import net.kerosilas.imageviewer.model.PixelColors;
 
 import java.io.File;
 

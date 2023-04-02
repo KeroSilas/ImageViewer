@@ -25,6 +25,9 @@ import javafx.stage.Stage;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.util.Duration;
 import net.kerosilas.imageviewer.model.*;
+import net.kerosilas.imageviewer.tasks.LoadImageTask;
+import net.kerosilas.imageviewer.tasks.PixelCounterTask;
+import net.kerosilas.imageviewer.tasks.SlideshowTask;
 
 public class ImageViewerWindowController {
 
@@ -54,7 +57,7 @@ public class ImageViewerWindowController {
             loadButton.setDisable(true);
             loadButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;");
 
-            ImageTask imageTask = new ImageTask(files, 10);
+            LoadImageTask imageTask = new LoadImageTask(files, 16);
             imageTask.setOnSucceeded(e -> {
                 for (Node node : hBoxTop.getChildren()) {
                     node.setDisable(false);

@@ -10,4 +10,6 @@ module net.kerosilas.imageviewer {
     opens net.kerosilas.imageviewer.model to javafx.fxml;
     exports net.kerosilas.imageviewer.controller;
     opens net.kerosilas.imageviewer.controller to javafx.fxml;
+    exports net.kerosilas.imageviewer.tasks;
+    opens net.kerosilas.imageviewer.tasks to javafx.fxml;
 }
