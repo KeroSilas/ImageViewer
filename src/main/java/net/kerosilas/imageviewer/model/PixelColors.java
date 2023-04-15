@@ -18,6 +18,7 @@ public record PixelColors(int redCount, int greenCount, int blueCount) {
         return (double) blueCount / getTotalCount();
     }
 
+    @Override
     public String toString() {
         return String.format("Red: %d (%.2f%%), Green: %d (%.2f%%), Blue: %d (%.2f%%)",
                 redCount, getRedPercentage() * 100,

@@ -14,7 +14,7 @@ public class ImageViewerApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(ImageViewerApplication.class.getResource("views/ImageViewerWindow.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Image Viewer");
-        stage.getIcons().add(new Image("file:src/main/resources/net/kerosilas/imageviewer/images/logo.png"));
+        stage.getIcons().add(new Image("file:src/main/resources/net/kerosilas/imageviewer/icons/logo.png"));
         stage.setMinWidth(740);
         stage.setMinHeight(240);
         stage.setWidth(1080);
