@@ -10,12 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+// Keeps track of a list of images and the current index of the image that is being displayed
+// This class is a singleton, so that it can be accessed from anywhere in the application
+// It also implements the PropertyChangeSupport class to notify the ImageViewerWindowController class when the current index changes
+
 public class ImageManager {
 
-    private final PropertyChangeSupport support;
+    private final PropertyChangeSupport support; // Used to notify the ImageViewerWindowController class when the current index changes
 
     private static ImageManager instance = null;
-    private final Vector<File> fileList;
+    private final Vector<File> fileList; // Vector is used instead of ArrayList because it is thread-safe
     private final Vector<ImagePane> imagePaneList;
 
     private int currentIndex = 0;
@@ -33,14 +37,13 @@ public class ImageManager {
         return instance;
     }
 
-    public boolean addImage(File file) {
+    public void addImage(File file) {
         ImagePane imagePane = new ImagePane(file);
         imagePaneList.add(imagePane);
         fileList.add(file);
-        return true;
     }
 
-    public List<HBox> getImagePaneList() {
+    public List<HBox> getImagePaneList() { // Returns a list of HBoxes to be put in the imageTilePane of the ImageViewerWindowController class
         List<HBox> hBoxList = new ArrayList<>();
         for (ImagePane imagePane : imagePaneList) {
             hBoxList.add(imagePane.getHBox());
@@ -52,10 +55,10 @@ public class ImageManager {
         return new Image(fileList.get(currentIndex).toURI().toString());
     }
 
-    public void setCurrentIndex(int newIndex) {
+    public synchronized void setCurrentIndex(int newIndex) {
         int oldIndex = this.currentIndex;
         this.currentIndex = newIndex;
-        support.firePropertyChange("currentIndex", oldIndex, newIndex);
+        support.firePropertyChange("currentIndex", oldIndex, newIndex); // Notifies the ImageViewerWindowController class when the current index changes
     }
 
     public void nextImage() {
@@ -80,9 +83,5 @@ public class ImageManager {
 
     public void addPropertyChangeListener(PropertyChangeListener pcl) {
         support.addPropertyChangeListener(pcl);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener pcl) {
-        support.removePropertyChangeListener(pcl);
     }
 }

@@ -50,6 +50,7 @@ public class ImageViewerWindowController {
         fileChooser.setTitle("Select image files");
         fileChooser.getExtensionFilters().add(new ExtensionFilter("Images",
                 "*.png", "*.jpg", "*.gif", "*.tif", "*.bmp"));
+        fileChooser.setInitialDirectory(new File("src/main/resources/net/kerosilas/imageviewer/images/")); // For testing purposes
         List<File> files = fileChooser.showOpenMultipleDialog(new Stage());
 
         if (files != null && !files.isEmpty()) {
@@ -57,16 +58,16 @@ public class ImageViewerWindowController {
             loadButton.setDisable(true);
             loadButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;");
 
-            LoadImageTask imageTask = new LoadImageTask(files, 16);
+            LoadImageTask imageTask = new LoadImageTask(files, 16); // 16 threads for loading images in parallel (you can change this)
             imageTask.setOnSucceeded(e -> {
-                for (Node node : hBoxTop.getChildren()) {
+                for (Node node : hBoxTop.getChildren()) { // Enable all buttons, only relevant when you load images the first time
                     node.setDisable(false);
                     if (node instanceof MFXButton) {
                         ((MFXButton) node).setButtonType(ButtonType.RAISED);
                     }
                 }
-                loadButton.setStyle("-fx-background-color:  #30a14f; -fx-text-fill: #ffffff;");
-                root.setStyle("-fx-background-color: #131313;");
+                loadButton.setStyle("-fx-background-color:  #30a14f; -fx-text-fill: #ffffff;"); // Set the load button to green
+                root.setStyle("-fx-background-color: #131313;"); // Set the background to black
                 hBoxBottom.setVisible(true);
                 progressSpinner.setVisible(false);
 
@@ -94,7 +95,7 @@ public class ImageViewerWindowController {
         stage.setFullScreen(!stage.isFullScreen());
     }
 
-    @FXML private void handleList() {
+    @FXML private void handleList() { // Toggle the list view
         if (imageScrollPane.isVisible()) {
             imageScrollPane.setVisible(false);
             listButton.setStyle("-fx-background-color: #ffffff;");
@@ -106,39 +107,42 @@ public class ImageViewerWindowController {
 
     @FXML private void handleImageClick(MouseEvent e) {
         if (e.getClickCount() == 2) {
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.setFullScreen(!stage.isFullScreen());
+            fullscreenButton.fire(); // Double click to toggle fullscreen
         }
     }
 
     public void initialize() {
         imageManager = ImageManager.getInstance();
-        imageManager.addPropertyChangeListener(e -> updateImage());
+        imageManager.addPropertyChangeListener(e -> { // Listen for changes in the current index
+            if (e.getPropertyName().equals("currentIndex"))
+                updateImage();
+        });
 
         slideshowSpeedSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            sliderValueLabel.setText(String.format("%ds", newValue.intValue()));
+            sliderValueLabel.setText(String.format("%ds", newValue.intValue())); // Update the slider value label
             if (isSlideshowRunning)
-                slideshowTask.setDelay(newValue.intValue());
+                slideshowTask.setDelay(newValue.intValue()); // Update the delay of the slideshow task
         });
 
         imageTilePane.setOnMouseClicked(e -> {
-            int index = imageTilePane.getChildren().indexOf(e.getTarget ());
-            if(index != -1) {
+            int index = imageTilePane.getChildren().indexOf(e.getTarget());
+            if(index != -1) { // If index is -1 then the click was not on an image
                 imageManager.setCurrentIndex(index);
-                updateImage();
             }
         });
 
         Platform.runLater(() -> {
+            // Scales the image to fit the window
             imageView.fitWidthProperty().bind(imageView.getScene().widthProperty());
             imageView.fitHeightProperty().bind(imageView.getScene().heightProperty());
+            // Centers the image (necessary when imageHBox is sent to back)
             imageHBox.translateXProperty().bind(imageView.getScene().widthProperty().divide(2));
             imageHBox.translateYProperty().bind(imageView.getScene().heightProperty().divide(2));
 
             initializeAnimations();
             initializeKeybindings();
         });
-        imageHBox.toBack();
+        imageHBox.toBack(); // The top and bottom hBoxes will now be on top of the image
     }
 
     private void toggleSlideshow() {
@@ -149,23 +153,22 @@ public class ImageViewerWindowController {
             thread.start();
 
             toggleSlideshowButton.setText("Stop slideshow");
-            toggleSlideshowButton.setStyle("-fx-background-color: #bd2323; -fx-text-fill: #ffffff;");
+            toggleSlideshowButton.setStyle("-fx-background-color: #bd2323; -fx-text-fill: #ffffff;"); // Set the button to red
             isSlideshowRunning = true;
         } else {
             slideshowTask.cancel();
 
             toggleSlideshowButton.setText("Start slideshow");
-            toggleSlideshowButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;");
+            toggleSlideshowButton.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #000000;"); // Set the button to white
             isSlideshowRunning = false;
         }
     }
 
     private void updateImage() {
-        new Thread(() -> {
-            imageView.setImage(imageManager.getCurrentImage());
-        }).start();
+        new Thread(() ->
+                imageView.setImage(imageManager.getCurrentImage())).start(); // Load the image in a new thread to prevent the UI from freezing when loading large images
         File file = imageManager.getCurrentFile();
-        Platform.runLater(() -> {
+        Platform.runLater(() -> { // Update the labels in the UI thread to prevent errors
             nameLabel.setText(file.getName().replace("%20", " "));
             pathLabel.setText(file.getParentFile().getPath());
             countPixelColors();
@@ -175,9 +178,15 @@ public class ImageViewerWindowController {
     private void countPixelColors() {
         PixelCounterTask pixelCounterTask = new PixelCounterTask();
         pixelCounterTask.setOnSucceeded(e -> {
-            redCountLabel.setText(String.format("%d (%.2f%%)", pixelCounterTask.getValue().redCount(), pixelCounterTask.getValue().getRedPercentage() * 100));
-            greenCountLabel.setText(String.format("%d (%.2f%%)", pixelCounterTask.getValue().greenCount(), pixelCounterTask.getValue().getGreenPercentage() * 100));
-            blueCountLabel.setText(String.format("%d (%.2f%%)", pixelCounterTask.getValue().blueCount(), pixelCounterTask.getValue().getBluePercentage() * 100));
+            redCountLabel.setText(String.format("%d (%.2f%%)",
+                    pixelCounterTask.getValue().redCount(),
+                    pixelCounterTask.getValue().getRedPercentage() * 100));
+            greenCountLabel.setText(String.format("%d (%.2f%%)",
+                    pixelCounterTask.getValue().greenCount(),
+                    pixelCounterTask.getValue().getGreenPercentage() * 100));
+            blueCountLabel.setText(String.format("%d (%.2f%%)",
+                    pixelCounterTask.getValue().blueCount(),
+                    pixelCounterTask.getValue().getBluePercentage() * 100));
         });
         Thread thread = new Thread(pixelCounterTask);
         thread.setDaemon(true);
@@ -192,18 +201,16 @@ public class ImageViewerWindowController {
         PauseTransition pause = new PauseTransition(Duration.millis(3000));
 
         pause.play();
-        pause.setOnFinished(e -> {
+        pause.setOnFinished(e -> { // If the mouse is not moved for 3 seconds, hide the bars
             ttTop.setByY(-50);
             ttBottom.setByY(50);
             ttList.setByY(-128);
             ttTop.play();
             ttBottom.play();
             ttList.play();
-
-            pause.playFromStart();
         });
 
-        root.getScene().setOnMouseMoved(e -> {
+        root.getScene().setOnMouseMoved(e -> { // If the mouse moves, show the bars
             if (imageScrollPane.getTranslateY() != 0) {
                 ttTop.setByY(50);
                 ttBottom.setByY(-50);
@@ -215,19 +222,7 @@ public class ImageViewerWindowController {
             pause.playFromStart();
         });
 
-        root.getScene().setOnMouseEntered(e -> {
-            if (imageScrollPane.getTranslateY() != 0) {
-                ttTop.setByY(50);
-                ttBottom.setByY(-50);
-                ttList.setByY(128);
-                ttTop.play();
-                ttBottom.play();
-                ttList.play();
-            }
-            pause.playFromStart();
-        });
-
-        root.getScene().setOnMouseExited(e -> {
+        root.getScene().setOnMouseExited(e -> { // If the mouse leaves the window, hide the bars
             if (imageScrollPane.getTranslateY() == 0) {
                 ttTop.setByY(-50);
                 ttBottom.setByY(50);
@@ -239,17 +234,11 @@ public class ImageViewerWindowController {
             pause.playFromStart();
         });
 
-        slideshowSpeedSlider.setOnMouseDragged(e -> {
-            pause.playFromStart();
-        });
+        slideshowSpeedSlider.setOnMouseDragged(e -> pause.playFromStart()); // If the user is dragging the slider, don't hide the bars
 
-        for (Node node : hBoxTop.getChildren()) {
-            node.setOnMouseEntered(event -> {
-                pause.stop();
-            });
-            node.setOnMouseExited(event -> {
-                pause.playFromStart();
-            });
+        for (Node node : hBoxTop.getChildren()) { // If the mouse is over a button, don't hide the bars
+            node.setOnMouseEntered(event -> pause.stop());
+            node.setOnMouseExited(event -> pause.playFromStart());
         }
     }
 
