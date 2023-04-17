@@ -1,9 +1,9 @@
 package net.kerosilas.imageviewer.model;
 
-public record PixelColors(int redCount, int greenCount, int blueCount) {
+public record PixelColors(int redCount, int greenCount, int blueCount, int mixedCount) {
 
     public int getTotalCount() {
-        return redCount + greenCount + blueCount;
+        return redCount + greenCount + blueCount + mixedCount;
     }
 
     public double getRedPercentage() {
@@ -18,12 +18,7 @@ public record PixelColors(int redCount, int greenCount, int blueCount) {
         return (double) blueCount / getTotalCount();
     }
 
-    @Override
-    public String toString() {
-        return String.format("Red: %d (%.2f%%), Green: %d (%.2f%%), Blue: %d (%.2f%%)",
-                redCount, getRedPercentage() * 100,
-                greenCount, getGreenPercentage() * 100,
-                blueCount, getBluePercentage() * 100);
+    public double getMixedPercentage() {
+        return (double) mixedCount / getTotalCount();
     }
-
 }

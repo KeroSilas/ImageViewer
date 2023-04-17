@@ -170,6 +170,12 @@
                   <Label fx:id="blueCountLabel" textFill="WHITE" />
                </children>
             </VBox>
+            <VBox alignment="CENTER_LEFT" layoutX="661.0" layoutY="10.0">
+               <children>
+                  <Label text="Mixed pixels:" textFill="WHITE" />
+                  <Label fx:id="mixedCountLabel" textFill="WHITE" />
+               </children>
+            </VBox>
          </children>
          <padding>
             <Insets left="10.0" right="10.0" />

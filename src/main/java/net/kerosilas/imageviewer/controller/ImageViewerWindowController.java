@@ -37,7 +37,7 @@ public class ImageViewerWindowController {
     @FXML private TilePane imageTilePane;
     @FXML private Slider slideshowSpeedSlider;
     @FXML private ImageView imageView;
-    @FXML private Label sliderValueLabel, nameLabel, pathLabel, blueCountLabel, greenCountLabel, redCountLabel;
+    @FXML private Label sliderValueLabel, nameLabel, pathLabel, blueCountLabel, greenCountLabel, redCountLabel, mixedCountLabel;
     @FXML private HBox hBoxTop, hBoxBottom, imageHBox;
     @FXML private BorderPane root;
 
@@ -187,6 +187,9 @@ public class ImageViewerWindowController {
             blueCountLabel.setText(String.format("%d (%.2f%%)",
                     pixelCounterTask.getValue().blueCount(),
                     pixelCounterTask.getValue().getBluePercentage() * 100));
+            mixedCountLabel.setText(String.format("%d (%.2f%%)",
+                    pixelCounterTask.getValue().mixedCount(),
+                    pixelCounterTask.getValue().getMixedPercentage() * 100));
         });
         Thread thread = new Thread(pixelCounterTask);
         thread.setDaemon(true);

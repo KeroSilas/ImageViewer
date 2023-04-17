@@ -25,6 +25,7 @@ public class PixelCounterTask extends Task<PixelColors> {
         int redCount = 0;
         int greenCount = 0;
         int blueCount = 0;
+        int mixedCount = 0;
 
         for (int x = 0; x < width; x++) { // Iterate over all pixels
             for (int y = 0; y < height; y++) {
@@ -36,10 +37,12 @@ public class PixelCounterTask extends Task<PixelColors> {
                     greenCount++;
                 } else if (color.getBlue() > color.getRed() && color.getBlue() > color.getGreen()) { // If the blue component is the largest, increment the blue counter
                     blueCount++;
+                } else if (color.getRed() == color.getGreen() || color.getRed() == color.getBlue() || color.getGreen() == color.getBlue()) { // If two components are equal, increment the mixed counter
+                    mixedCount++;
                 }
             }
         }
 
-        return new PixelColors(redCount, greenCount, blueCount); // Store the results in a PixelColors object
+        return new PixelColors(redCount, greenCount, blueCount, mixedCount); // Store the results in a PixelColors object
     }
 }
